@@ -3,7 +3,7 @@ import { Vector } from "./vector";
 import { Renderer } from "./renderer";
 
 export var root = new GameObject('root', new Vector(0, 0));
-export var renderer = new Renderer(document.querySelector('#game'));
+export var renderer = new Renderer(document.querySelector('#game'), {drawTransforms: true});
 
 export var pause: boolean = false;
 export var stop: boolean = false;
@@ -54,6 +54,12 @@ function update() {
     if (!pause) {
         root.foreachGameObject((object: GameObject) => {
             object.update();
+        });
+
+        renderer.update();
+
+        root.foreachGameObject((object: GameObject) => {
+            object.drawUpdate();
         });
     }
 

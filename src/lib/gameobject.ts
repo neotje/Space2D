@@ -11,9 +11,11 @@ export class GameObject {
     id: number;
     name: string;
     position: Vector;
-    components: Component[] = [];
+
+    color: string;
 
     children: GameObject[] = [];
+    components: Component[] = [];
 
     constructor(name: string, position: Vector) {
         this.id = lastID;
@@ -29,7 +31,7 @@ export class GameObject {
         var object: GameObject = this;
         var result: Vector = new Vector(0, 0);
 
-        while(!isRoot) {
+        while (!isRoot) {
             vectors.push(object.position);
             object = parentOf(object);
 
@@ -45,7 +47,11 @@ export class GameObject {
         return result;
     }
 
-    
+    relativePosToWorld(v: Vector): Vector {
+        return this.worldPosition.add(v);
+    }
+
+
     getChildById(id: number): GameObject {
         for (const child of this.children) {
             if (id == child.id) {
@@ -65,12 +71,12 @@ export class GameObject {
 
         return a;
     }
-    addChild(c: GameObject) {
-        this.children.push(c);
+    addChild(...c: GameObject[]) {
+        this.children = this.children.concat(c);
         return this;
     }
 
-    
+
     getComponentById(id: number) {
         for (const component of this.components) {
             if (id == component.id) {
@@ -97,27 +103,56 @@ export class GameObject {
         }
     }
 
-    findComponent(identifier: string) {
+    findComponent(identifier: string): any | any[] {
         var identifierType: string;
 
         if (identifier[0] == "#") {
             identifierType = "id";
+            identifier = identifier.replace('#', '')
         } else if (identifier[0] == ".") {
             identifierType = "type";
+            identifier = identifier.replace('.', '');
         } else {
             identifierType = "name";
-        }
+        }        
 
-        var a = [];
+        let a: Component[] = [];
 
         this.foreachGameObject((object: GameObject) => {
-            
+            for (var component of object.components) {
+                switch (identifierType) {
+                    case "id":
+                        if (component.id == parseInt(identifier)) {
+                            return component;
+                        }
+                        break;
+
+                    case "type":
+                        if (component.type == identifier) {
+                            a.push(component);
+                        }
+                        break;
+
+                    case "name":
+                        if (component.name == identifier) {
+                            a.push(component);
+                        }
+                        break;
+                }
+            }
         });
+
+        if (identifierType == "type" || identifierType == "name") {
+            return a;
+        }
+        return undefined;
     }
 
-    addComponent(c: Component): this {
-        c.parent = this;
-        this.components.push(c);
+    addComponent(...c: Component[]): this {
+        for (const com of c) {
+            com.parent = this;
+            this.components.push(com);
+        }
         return this;
     }
 
@@ -134,7 +169,7 @@ export class GameObject {
             }
             return;
         }
-    
+
         return loop(this);
     }
 

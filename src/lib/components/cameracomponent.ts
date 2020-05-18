@@ -1,5 +1,7 @@
 import { Component } from "../component";
 import { Vector } from "../vector";
+import anime from "../anime.es";
+import { renderer } from "../game";
 
 interface ViewPort {
     width: number;
@@ -10,6 +12,8 @@ interface ViewPort {
 export class CameraComponent extends Component {
     viewport: ViewPort;
     zoom: number = 0;
+    showBorders: boolean = false;
+    overflow: boolean = true;
 
     private parentPos: Vector;
 
@@ -25,6 +29,16 @@ export class CameraComponent extends Component {
 
     worldPosToCanvas(v: Vector): Vector {
         return this.viewport.position.copy().add(this.worldPosToViewport(v));
+    }
+
+    zoomTo(z: number, callback: Function = function(){}) {
+        anime({
+            targets: this,
+            zoom: z,
+            easing: 'easeInOutExpo',
+            duration: 1500,
+            complete: callback
+        });
     }
 
     update() {
