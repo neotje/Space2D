@@ -1,11 +1,13 @@
 import { CameraComponent } from "./components/cameracomponent";
-import { root } from "./game";
+import { root, getStatistics } from "./game";
 import { Vector } from "./vector";
 import { GameObject } from "./gameobject";
 
 interface RendererOptions {
     drawTransforms?: boolean;
-    showViewPortBorder?: boolean;
+    imageSmoothing?: boolean;
+    smoothingQuality?: "low" | "medium" | "high";
+    drawStats?: boolean;
 }
 
 interface line {
@@ -56,18 +58,26 @@ export class Renderer {
         this.options = options;
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
+
+        this.ctx.imageSmoothingEnabled = (options.imageSmoothing) ? false : options.imageSmoothing;
+        this.ctx.imageSmoothingQuality = (options.smoothingQuality) ? "medium" : options.smoothingQuality;
     }
 
     update() {
         this.cameras = root.findComponent('.CameraComponent')
 
         if (this.options.drawTransforms) {
+            this.drawPoint(root.worldPosition, root.color, 5);
             root.foreachGameObject((object: GameObject) => {
                 if (!object.color) {
                     object.color = this.randomColor();
                 }
                 this.drawPoint(object.worldPosition, object.color, 5);
             })
+        }
+
+        if (this.options.drawStats) {
+            this.drawStatistics();
         }
 
         for (const camera of this.cameras) {
@@ -80,6 +90,12 @@ export class Renderer {
 
     randomColor(): string {
         return "#" + Math.floor(Math.random() * 16777215).toString(16);
+    }
+
+    drawStatistics(): void {
+        var stats = getStatistics();
+        this.ctx.fillText(`fps: ${Math.round(stats.fps)} `, 10, 10);
+        this.ctx.fillText(`dt: ${stats.deltaTime}`, 10, 24);
     }
 
     drawPoint(pos: Vector, color: string, thickness: number): void {

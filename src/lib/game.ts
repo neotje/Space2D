@@ -2,14 +2,25 @@ import { GameObject } from "./gameobject";
 import { Vector } from "./vector";
 import { Renderer } from "./renderer";
 
-export var root = new GameObject('root', new Vector(0, 0));
-export var renderer = new Renderer(document.querySelector('#game'), {drawTransforms: true});
+export var root = new GameObject({name: "root", position: new Vector(0, 0), color: "#ff0000"});
+export var renderer = new Renderer(document.querySelector('#game'), {
+    imageSmoothing: false, 
+    drawTransforms: true,
+    drawStats: true
+});
 
 export var pause: boolean = false;
 export var stop: boolean = false;
 
+var startTime: number;
+var endTime: number;
 var deltaTime: number;
 var fps: number;
+
+interface Statistics {
+    fps: number;
+    deltaTime: number;
+}
 
 export function parentOf(obj: GameObject): GameObject {
 
@@ -34,6 +45,7 @@ export function parentOf(obj: GameObject): GameObject {
 }
 
 export function start() {
+    startTime = performance.now();
     window.requestAnimationFrame(update);
 }
 
@@ -41,10 +53,15 @@ export function getDeltaTime(): number {
     return deltaTime;
 }
 
-var startTime: number = performance.now();
+export function getStatistics(): Statistics {
+    return {
+        fps: fps,
+        deltaTime: deltaTime
+    }
+}
 
 function update() {
-    var endTime: number = performance.now();
+    endTime = performance.now();
     deltaTime = (endTime - startTime) / 1000;
     fps = 1 / deltaTime;
     startTime = performance.now();    

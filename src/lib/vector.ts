@@ -1,3 +1,5 @@
+import anime from "./anime.es";
+
 export class Vector {
     public x: number;
     public y: number;
@@ -14,6 +16,18 @@ export class Vector {
         if (this.magnitude != 0) {
             this.scale(l / this.magnitude);
         }
+    }
+
+    get angle(): number {
+        return Math.atan2(this.y, this.x)
+    }
+    set angle(a: number) {
+        var r = this.magnitude;
+
+        this.x = Math.cos(a) * r;
+        this.y = Math.sin(a) * r;
+        if (this.y < 1.3e-16 && this.y > -1.3e-16) this.y = 0;
+        if (this.x < 1.3e-16 && this.x > -1.3e-16) this.x = 0;
     }
 
     equalTo(v: Vector): Boolean {
@@ -42,6 +56,14 @@ export class Vector {
 
         return this;
     }
+    scaleX(s: number): this {
+        this.x *= s;
+        return this;
+    }
+    scaleY(s: number): this {
+        this.y *= s;
+        return this;
+    }
 
     distanceTo(v: Vector): number {
         return Math.sqrt(this.dotproduct(v));
@@ -49,6 +71,20 @@ export class Vector {
 
     dotproduct(v: Vector): number {
         return this.x * v.x + this.y * v.y;
+    }
+
+    rotate(a: number, duration?: number): this {
+        if (duration) {
+            anime({
+                targets: this,
+                angle: this.angle + a,
+                easing: 'linear',
+                duration: duration
+            });
+        } else {
+            this.angle += a;
+            return this;
+        }
     }
 
     copy(): Vector {

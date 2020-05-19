@@ -8,11 +8,12 @@ export class MeshComponent extends Component {
     }
 
     draw() {
-        renderer.drawLine({start: this.parent.relativePosToWorld(new Vector(1, 1)), end: this.parent.relativePosToWorld(new Vector(3,5))})
+        renderer.drawLine({start: this.parent.relativePosToWorld(new Vector(0, 0)), end: this.parent.relativePosToWorld(new Vector(3,5))})
 
         renderer.drawRect({
             start: this.parent.relativePosToWorld(new Vector(4, 3)),
-            end: this.parent.relativePosToWorld(new Vector(5, 5)),
+            width: 2,
+            height: 3,
             fill: {},
             stroke: {width: 3}
         });

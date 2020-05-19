@@ -2,42 +2,53 @@ import { Vector } from './vector';
 import { Component } from './component';
 import { MeshComponent } from './components/meshcomponent';
 import { root, parentOf } from './game';
+import anime from './anime.es';
 
 var lastID = 0;
 
-type ComponentTypes = Component | MeshComponent;
+interface GameObjectOptions {
+    name: string,
+
+    position: Vector;
+    rotation?: number;
+    scale?: Vector;
+
+    color?: string;
+}
 
 export class GameObject {
-    id: number;
+    readonly id: number;
     name: string;
+
     position: Vector;
+    rotation: number;
+    scale: Vector;
 
     color: string;
 
+    parent: GameObject;
     children: GameObject[] = [];
     components: Component[] = [];
 
-    constructor(name: string, position: Vector) {
+    constructor(opt: GameObjectOptions) {
         this.id = lastID;
         lastID++;
 
-        this.name = name;
-        this.position = position;
+        this.name = opt.name;
+        this.position = opt.position;
+        this.rotation = (opt.rotation) ? opt.rotation : 0;
+        this.scale = (opt.scale) ? opt.scale : new Vector(1, 1);
+        this.color = (opt.color) ? opt.color : "#000";
     }
 
     get worldPosition(): Vector {
-        var isRoot: Boolean = false;
         var vectors: Vector[] = [];
         var object: GameObject = this;
         var result: Vector = new Vector(0, 0);
 
-        while (!isRoot) {
+        while (object.parent) {
             vectors.push(object.position);
-            object = parentOf(object);
-
-            if (object.name == 'root') {
-                isRoot = true;
-            }
+            object = object.parent;
         }
 
         for (let i = vectors.length - 1; i >= 0; i--) {
@@ -48,7 +59,7 @@ export class GameObject {
     }
 
     relativePosToWorld(v: Vector): Vector {
-        return this.worldPosition.add(v);
+        return this.worldPosition.add(v.rotate(this.rotation).scaleX(this.scale.x).scaleY(this.scale.y));
     }
 
 
@@ -71,8 +82,47 @@ export class GameObject {
 
         return a;
     }
-    addChild(...c: GameObject[]) {
-        this.children = this.children.concat(c);
+    find(identifier: string): any | any[] {
+        var identifierType: string;
+
+        if (identifier[0] == "#") {
+            identifierType = "id";
+            identifier = identifier.replace('#', '')
+        } else {
+            identifierType = "name";
+        }
+
+        let a: GameObject[] = [];
+        let b: GameObject;
+
+        this.foreachGameObject((obj: GameObject) => {
+            switch (identifierType) {
+                case "id":
+                    if (obj.id == parseInt(identifier)) {
+                        b = obj;
+                    }
+                    break;
+
+                case "name":
+                    if (obj.name == identifier) {
+                        a.push(obj);
+                    }
+                    break;
+            }
+        });
+
+        if (identifierType == "id") {
+            return b;
+        } else {
+            return a;
+        }
+    }
+
+    addChild(...o: GameObject[]) {
+        for (const obj of o) {
+            obj.parent = this;
+        }
+        this.children = this.children.concat(o);
         return this;
     }
 
@@ -102,7 +152,6 @@ export class GameObject {
             }
         }
     }
-
     findComponent(identifier: string): any | any[] {
         var identifierType: string;
 
@@ -114,16 +163,17 @@ export class GameObject {
             identifier = identifier.replace('.', '');
         } else {
             identifierType = "name";
-        }        
+        }
 
         let a: Component[] = [];
+        let b: Component;
 
         this.foreachGameObject((object: GameObject) => {
             for (var component of object.components) {
                 switch (identifierType) {
                     case "id":
                         if (component.id == parseInt(identifier)) {
-                            return component;
+                            b = component;
                         }
                         break;
 
@@ -144,6 +194,8 @@ export class GameObject {
 
         if (identifierType == "type" || identifierType == "name") {
             return a;
+        } else {
+            return b;
         }
         return undefined;
     }
@@ -171,6 +223,17 @@ export class GameObject {
         }
 
         return loop(this);
+    }
+
+
+    rotateTo(a: number, duration: number, callback: Function = function(){}) {
+        anime({
+            targets: this,
+            rotation: a,
+            easing: 'linear',
+            duration: duration,
+            complete: callback
+        });
     }
 
 
