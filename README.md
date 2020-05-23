@@ -25,6 +25,7 @@ GameObject{
 }
 ```
 
+more detailed game tree.
 ```
 GameObject {
     id: 0
