@@ -16,11 +16,12 @@ var startTime: number;
 var endTime: number;
 var deltaTime: number;
 var fps: number;
-var speed: number = 5;
+var speed: number = 1;
 
 interface Statistics {
     fps: number;
     deltaTime: number;
+    speed: number;
 }
 
 export function parentOf(obj: GameObject): GameObject {
@@ -57,7 +58,8 @@ export function getDeltaTime(): number {
 export function getStatistics(): Statistics {
     return {
         fps: fps,
-        deltaTime: deltaTime
+        deltaTime: deltaTime,
+        speed: speed
     }
 }
 

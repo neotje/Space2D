@@ -118,6 +118,7 @@ export class Renderer {
         var stats = getStatistics();
         this.ctx.fillText(`fps: ${Math.round(stats.fps)} `, 10, 10);
         this.ctx.fillText(`dt: ${stats.deltaTime}`, 10, 24);
+        this.ctx.fillText(`speed: ${stats.speed}`, 10, 38);
     }
 
     drawText(pos: Vector, offset: Vector, text: string): void {
