@@ -24,7 +24,7 @@ export class CameraComponent extends Component {
     }
 
     worldPosToViewport(v: Vector): Vector {
-        return this.parentPos.difference(v).scale(this.zoom);
+        return this.parentPos.difference(v).scale(this.zoom).add(new Vector(this.viewport.width / 2, this.viewport.height / 2));
     }
 
     worldPosToCanvas(v: Vector): Vector {

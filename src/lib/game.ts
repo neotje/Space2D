@@ -16,6 +16,7 @@ var startTime: number;
 var endTime: number;
 var deltaTime: number;
 var fps: number;
+var speed: number = 5;
 
 interface Statistics {
     fps: number;
@@ -50,7 +51,7 @@ export function start() {
 }
 
 export function getDeltaTime(): number {
-    return deltaTime;
+    return deltaTime * speed;
 }
 
 export function getStatistics(): Statistics {

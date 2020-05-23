@@ -58,8 +58,12 @@ export class GameObject {
         return result;
     }
 
+    set worldPosition(v: Vector) {                        
+        this.position.add(this.worldPosition.difference(v));
+    }
+
     relativePosToWorld(v: Vector): Vector {
-        return this.worldPosition.add(v.rotate(this.rotation).scaleX(this.scale.x).scaleY(this.scale.y));
+        return this.worldPosition.add(v.scaleX(this.scale.x).scaleY(this.scale.y).rotate(this.rotation));
     }
 
 

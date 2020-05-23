@@ -33,6 +33,23 @@ interface circle {
     stroke?: stroke;
 }
 
+interface ellipse {
+    pos: Vector;
+    radius: Vector;
+    fill?: fill;
+    stroke?: stroke;
+}
+
+interface point {
+    pos: Vector;
+}
+
+interface polygon {
+    points: Vector[];
+    fill?: fill;
+    stroke?: stroke;
+}
+
 interface fill {
     color?: string;
 }
@@ -61,6 +78,9 @@ export class Renderer {
 
         this.ctx.imageSmoothingEnabled = (options.imageSmoothing) ? false : options.imageSmoothing;
         this.ctx.imageSmoothingQuality = (options.smoothingQuality) ? "medium" : options.smoothingQuality;
+
+        this.canvas.width = document.querySelector('body').clientWidth;
+        this.canvas.height = document.querySelector('body').clientHeight;
     }
 
     update() {
@@ -73,6 +93,8 @@ export class Renderer {
                     object.color = this.randomColor();
                 }
                 this.drawPoint(object.worldPosition, object.color, 5);
+
+                this.drawText(object.worldPosition, new Vector(0, 15), `#${object.id} ${object.name}`);
             })
         }
 
@@ -96,6 +118,13 @@ export class Renderer {
         var stats = getStatistics();
         this.ctx.fillText(`fps: ${Math.round(stats.fps)} `, 10, 10);
         this.ctx.fillText(`dt: ${stats.deltaTime}`, 10, 24);
+    }
+
+    drawText(pos: Vector, offset: Vector, text: string): void {
+        for (const camera of this.cameras) {
+            var pos = camera.worldPosToCanvas(pos).add(offset);
+            this.ctx.fillText(text, pos.x, pos.y);
+        }
     }
 
     drawPoint(pos: Vector, color: string, thickness: number): void {
@@ -134,17 +163,17 @@ export class Renderer {
             this.ctx.beginPath();
             this.ctx.rect(start.x, start.y, difference.x, difference.y);
             this.ctx.closePath();
-        }
 
-        if (opt.fill) {
-            this.ctx.fillStyle = (!opt.fill.color) ? "#000" : opt.fill.color;
-            this.ctx.fill();
-        }
-
-        if (opt.stroke) {
-            this.ctx.lineWidth = (!opt.stroke.width) ? 1 : opt.stroke.width;
-            this.ctx.strokeStyle = (!opt.stroke.color) ? "#ff0000" : opt.stroke.color;
-            this.ctx.stroke();
+            if (opt.fill) {
+                this.ctx.fillStyle = (!opt.fill.color) ? "#000" : opt.fill.color;
+                this.ctx.fill();
+            }
+    
+            if (opt.stroke) {
+                this.ctx.lineWidth = (!opt.stroke.width) ? 1 : opt.stroke.width;
+                this.ctx.strokeStyle = (!opt.stroke.color) ? "#ff0000" : opt.stroke.color;
+                this.ctx.stroke();
+            }
         }
     }
 
@@ -156,17 +185,79 @@ export class Renderer {
             this.ctx.beginPath();
             this.ctx.ellipse(start.x, start.y, radius, radius, 0, 0, 2 * Math.PI);
             this.ctx.closePath();
-        }
 
-        if (circle.fill) {
-            this.ctx.fillStyle = (!circle.fill.color) ? "#000" : circle.fill.color;
-            this.ctx.fill();
-        }
+            if (circle.fill) {
+                this.ctx.fillStyle = (!circle.fill.color) ? "#000" : circle.fill.color;
+                this.ctx.fill();
+            }
+    
+            if (circle.stroke) {
+                this.ctx.lineWidth = (!circle.stroke.width) ? 1 : circle.stroke.width;
+                this.ctx.strokeStyle = (!circle.stroke.color) ? "#ff0000" : circle.stroke.color;
+                this.ctx.stroke();
+            }
+        }  
+    }
 
-        if (circle.stroke) {
-            this.ctx.lineWidth = (!circle.stroke.width) ? 1 : circle.stroke.width;
-            this.ctx.strokeStyle = (!circle.stroke.color) ? "#ff0000" : circle.stroke.color;
-            this.ctx.stroke();
+    drawEllipse(ellipse: ellipse): void {
+        for (const camera of this.cameras) {
+            var center = camera.worldPosToCanvas(ellipse.pos);
+            var radius = ellipse.radius;
+
+            this.ctx.beginPath();
+            this.ctx.ellipse(center.x, center.y, radius.x, radius.y, 0, 0, 2*Math.PI);
+            this.ctx.closePath();
+
+            if (ellipse.fill) {
+                this.ctx.fillStyle = (!ellipse.fill.color) ? "#000" : ellipse.fill.color;
+                this.ctx.fill();
+            }
+    
+            if (ellipse.stroke) {
+                this.ctx.lineWidth = (!ellipse.stroke.width) ? 1 : ellipse.stroke.width;
+                this.ctx.strokeStyle = (!ellipse.stroke.color) ? "#ff0000" : ellipse.stroke.color;
+                this.ctx.stroke();
+            }
+        }
+    }
+
+    drawPolygon(polygon: polygon) {
+        for (const camera of this.cameras) {
+            var first = camera.worldPosToCanvas(polygon.points[0]);
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(first.x, first.y)
+            for (const p of polygon.points) {
+                var cp = camera.worldPosToCanvas(p);
+                this.ctx.lineTo(cp.x, cp.y);
+            }
+            this.ctx.lineTo(first.x, first.y)
+            this.ctx.closePath();
+
+            if (polygon.fill) {
+                this.ctx.fillStyle = (!polygon.fill.color) ? "#000" : polygon.fill.color;
+                this.ctx.fill();
+            }
+    
+            if (polygon.stroke) {
+                this.ctx.lineWidth = (!polygon.stroke.width) ? 1 : polygon.stroke.width;
+                this.ctx.strokeStyle = (!polygon.stroke.color) ? "#ff0000" : polygon.stroke.color;
+                this.ctx.stroke();
+            }
+        }
+    }
+
+    drawPointList(points: Vector[]) {
+        for (let i = 0; i < points.length; i++) {
+            const p = points[i];
+            const next = points[i + 1];
+
+            if (next) {
+                this.drawLine({
+                    start: p,
+                    end: next
+                })
+            }
         }
     }
 

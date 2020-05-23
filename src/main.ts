@@ -1,23 +1,41 @@
-import { root, parentOf, start } from './lib/game';
+import { root, parentOf, start, renderer } from './lib/game';
 import { GameObject } from './lib/gameobject';
 import { Vector } from './lib/vector';
 import { CameraComponent } from './lib/components/cameracomponent';
-import { MeshComponent } from './lib/components/meshcomponent';
+import { PhysicsComponent } from './lib/components/physicscomponent';
+
 
 root.addChild(
-    new GameObject({name: "player", position: new Vector(-5,-5)}).addComponent(
+    new GameObject({ name: "player", position: new Vector(0, 0) }).addComponent(
         new CameraComponent(
             document.querySelector("#game"),
             'camera1',
             {
-                width: 800,
-                height: 400,
+                width: renderer.canvas.width,
+                height: renderer.canvas.height,
                 position: new Vector(0, 0)
             }
         )
     ),
-    new GameObject({name: 'test', position: new Vector(5, 5), rotation: 0}).addComponent(
-        new MeshComponent()
+    new GameObject({ name: 'sun', position: new Vector(8, 8), rotation: 0 }).addComponent(
+        new PhysicsComponent('physics', {
+            mass: 100000000000,
+            debug: true
+        })
+    ),
+    new GameObject({ name: 'planet 1', position: new Vector(5, 5), rotation: 0 }).addComponent(
+        new PhysicsComponent('obj2', {
+            mass: 100,
+            velocity: new Vector(0.25, -0.25),
+            debug: true
+        })
+    ),
+    new GameObject({ name: 'planet 2', position: new Vector(4, 4), rotation: 0 }).addComponent(
+        new PhysicsComponent('obj2', {
+            mass: 100,
+            velocity: new Vector(-0.5, 0.5),
+            debug: true
+        })
     )
 )
 
@@ -25,17 +43,10 @@ console.log(root);
 
 start();
 
-var obj: GameObject[] = root.find('test');
-console.log(obj);
-
 
 var cam: CameraComponent = root.findComponent('.CameraComponent')[0];
 cam.zoomTo(10, () => {
-    cam.zoomTo(25);
-    obj[0].rotateTo(Math.PI, 2000, ()=>{
-        console.log(obj[0]);
-        
-    });
+    cam.zoomTo(17);
 });
 cam.showBorders = false;
 

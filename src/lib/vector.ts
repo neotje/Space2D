@@ -1,5 +1,9 @@
 import anime from "./anime.es";
 
+export function vector(x: number, y: number): Vector {
+    return new Vector(x, y);
+}
+
 export class Vector {
     public x: number;
     public y: number;
@@ -85,6 +89,11 @@ export class Vector {
             this.angle += a;
             return this;
         }
+    }
+
+    lookAt(v: Vector): this {
+        this.angle = this.difference(v).angle;
+        return this;
     }
 
     copy(): Vector {
