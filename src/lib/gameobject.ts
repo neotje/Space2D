@@ -207,6 +207,7 @@ export class GameObject {
     addComponent(...c: Component[]): this {
         for (const com of c) {
             com.parent = this;
+            com.onInit();
             this.components.push(com);
         }
         return this;

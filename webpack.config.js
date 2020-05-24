@@ -3,7 +3,8 @@ module.exports = {
   entry: './src/main.ts',
   devtool: 'inline-source-map',
   devServer: {
-    contentBase: './dist'
+    contentBase: './dist',
+    host: '192.168.111.31'
   },
   module: {
     rules: [

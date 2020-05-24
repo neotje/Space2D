@@ -4,9 +4,10 @@ import { Renderer } from "./renderer";
 
 export var root = new GameObject({name: "root", position: new Vector(0, 0), color: "#ff0000"});
 export var renderer = new Renderer(document.querySelector('#game'), {
-    imageSmoothing: false, 
+    imageSmoothing: true, 
     drawTransforms: true,
-    drawStats: true
+    drawStats: true,
+    smoothingQuality: "high"
 });
 
 export var pause: boolean = false;
@@ -49,6 +50,8 @@ export function parentOf(obj: GameObject): GameObject {
 export function start() {
     startTime = performance.now();
     window.requestAnimationFrame(update);
+
+    //setInterval(update, 0)
 }
 
 export function getDeltaTime(): number {

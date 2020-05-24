@@ -69,12 +69,26 @@ export class Vector {
         return this;
     }
 
+    divide(s: number): this {
+        if (s > 0) {
+            this.x = this.x / s;
+            this.y = this.y / s;
+        }
+        return this;
+    }
+
     distanceTo(v: Vector): number {
-        return Math.sqrt(this.dotproduct(v));
+        var v1 = this.difference(v);
+        return v1.magnitude;
     }
 
     dotproduct(v: Vector): number {
         return this.x * v.x + this.y * v.y;
+    }
+
+    rotateBy(a: number): this {
+        this.angle = this.angle + a;
+        return this;
     }
 
     rotate(a: number, duration?: number): this {

@@ -92,7 +92,7 @@ export class Renderer {
                 if (!object.color) {
                     object.color = this.randomColor();
                 }
-                this.drawPoint(object.worldPosition, object.color, 5);
+                this.drawPoint(object.worldPosition, object.color, 3);
 
                 this.drawText(object.worldPosition, new Vector(0, 15), `#${object.id} ${object.name}`);
             })

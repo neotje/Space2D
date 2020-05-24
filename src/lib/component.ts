@@ -16,6 +16,8 @@ export class Component {
         this.name = name;
     }
 
+    onInit(): void {}
+
     update(): void {}
 
     draw(): void {}
