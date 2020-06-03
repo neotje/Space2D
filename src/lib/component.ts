@@ -18,6 +18,8 @@ export class Component {
 
     onInit(): void {}
 
+    loopStart(): void {}
+
     update(): void {}
 
     draw(): void {}

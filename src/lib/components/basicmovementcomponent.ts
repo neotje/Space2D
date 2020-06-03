@@ -1,5 +1,5 @@
 import { Component } from "../component";
-import { getDeltaTime, renderer } from "../game";
+import { getDeltaTime, renderer, setSpeed, getSpeed } from "../game";
 
 export class BasicMovementComponent extends Component {
     speed: number;
@@ -45,6 +45,20 @@ export class BasicMovementComponent extends Component {
             }
             if (key == 'd') {
                 this.right = false;
+            }
+        });
+
+        window.addEventListener('keypress', (e) => {
+            var key = e.key;
+
+            console.log(key);
+            
+
+            if (key == '=') {
+                setSpeed(getSpeed() + 1);
+            }
+            if (key == '-') {
+                setSpeed(getSpeed() - 1);
             }
         })
 

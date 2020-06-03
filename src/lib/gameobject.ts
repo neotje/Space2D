@@ -38,7 +38,7 @@ export class GameObject {
         this.position = opt.position;
         this.rotation = (opt.rotation) ? opt.rotation : 0;
         this.scale = (opt.scale) ? opt.scale : new Vector(1, 1);
-        this.color = (opt.color) ? opt.color : "#000";
+        this.color = (opt.color) ? opt.color : "#fff";
     }
 
     get worldPosition(): Vector {
@@ -241,6 +241,11 @@ export class GameObject {
         });
     }
 
+    loopStart() {
+        for (const component of this.components) {
+            component.loopStart();
+        }
+    }
 
     update() {
         for (const component of this.components) {

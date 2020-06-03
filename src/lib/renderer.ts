@@ -84,7 +84,16 @@ export class Renderer {
     }
 
     update() {
-        this.cameras = root.findComponent('.CameraComponent')
+        this.cameras = root.findComponent('.CameraComponent');
+
+        for (const camera of this.cameras) {
+            this.ctx.fillStyle = camera.backgroundColor;
+            this.ctx.fillRect(camera.viewport.position.x, camera.viewport.position.y, camera.viewport.width, camera.viewport.height);
+            if (camera.showBorders) {
+                this.ctx.strokeStyle = '#ff0000';
+                this.ctx.strokeRect(camera.viewport.position.x, camera.viewport.position.y, camera.viewport.width, camera.viewport.height)
+            }
+        }
 
         if (this.options.drawTransforms) {
             this.drawPoint(root.worldPosition, root.color, 5);
@@ -101,13 +110,6 @@ export class Renderer {
         if (this.options.drawStats) {
             this.drawStatistics();
         }
-
-        for (const camera of this.cameras) {
-            if (camera.showBorders) {
-                this.ctx.strokeStyle = '#ff0000';
-                this.ctx.strokeRect(camera.viewport.position.x, camera.viewport.position.y, camera.viewport.width, camera.viewport.height)
-            }
-        }
     }
 
     randomColor(): string {
@@ -116,6 +118,7 @@ export class Renderer {
 
     drawStatistics(): void {
         var stats = getStatistics();
+        this.ctx.fillStyle = "#fff"
         this.ctx.fillText(`fps: ${Math.round(stats.fps)} `, 10, 10);
         this.ctx.fillText(`dt: ${stats.deltaTime}`, 10, 24);
         this.ctx.fillText(`speed: ${stats.speed}`, 10, 38);
@@ -140,7 +143,7 @@ export class Renderer {
     }
 
     drawLine(opt: line): void {
-        this.ctx.strokeStyle = (!opt.color) ? "#000" : opt.color;
+        this.ctx.strokeStyle = (!opt.color) ? "#fff" : opt.color;
         this.ctx.lineWidth = (!opt.width) ? 1 : opt.width;        
 
         for (const camera of this.cameras) {
@@ -166,7 +169,7 @@ export class Renderer {
             this.ctx.closePath();
 
             if (opt.fill) {
-                this.ctx.fillStyle = (!opt.fill.color) ? "#000" : opt.fill.color;
+                this.ctx.fillStyle = (!opt.fill.color) ? "#fff" : opt.fill.color;
                 this.ctx.fill();
             }
     
@@ -188,7 +191,7 @@ export class Renderer {
             this.ctx.closePath();
 
             if (circle.fill) {
-                this.ctx.fillStyle = (!circle.fill.color) ? "#000" : circle.fill.color;
+                this.ctx.fillStyle = (!circle.fill.color) ? "#fff" : circle.fill.color;
                 this.ctx.fill();
             }
     
@@ -210,7 +213,7 @@ export class Renderer {
             this.ctx.closePath();
 
             if (ellipse.fill) {
-                this.ctx.fillStyle = (!ellipse.fill.color) ? "#000" : ellipse.fill.color;
+                this.ctx.fillStyle = (!ellipse.fill.color) ? "#fff" : ellipse.fill.color;
                 this.ctx.fill();
             }
     
@@ -236,7 +239,7 @@ export class Renderer {
             this.ctx.closePath();
 
             if (polygon.fill) {
-                this.ctx.fillStyle = (!polygon.fill.color) ? "#000" : polygon.fill.color;
+                this.ctx.fillStyle = (!polygon.fill.color) ? "#fff" : polygon.fill.color;
                 this.ctx.fill();
             }
     

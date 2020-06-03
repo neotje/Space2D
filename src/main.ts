@@ -5,6 +5,7 @@ import { CameraComponent } from './lib/components/cameracomponent';
 import { PhysicsComponent } from './lib/components/physicscomponent';
 import { escapeVelocityVector } from './lib/physics/formulas';
 import { BasicMovementComponent } from './lib/components/basicmovementcomponent';
+import { Line } from "./lib/math";
 
 
 root.addChild(
@@ -24,6 +25,9 @@ root.addChild(
         new PhysicsComponent('physics', {
             mass: 1.989e15,
             debug: true
+        }, {
+            x: true,
+            y: true
         })
     ),
     new GameObject({ name: 'planet 1', position: new Vector(100, 0), rotation: 0 }).addComponent(
@@ -37,6 +41,13 @@ root.addChild(
         new PhysicsComponent('obj2', {
             mass: 5.972e12,
             velocity: escapeVelocityVector(1.989e15, new Vector(0, 0), new Vector(200, 0)).add(new Vector(0, 0)),
+            debug: true
+        })
+    ),
+    new GameObject({ name: 'exoplanet 3', position: new Vector(0, -250), rotation: 0 }).addComponent(
+        new PhysicsComponent('obj2', {
+            mass: 5.972e12,
+            velocity: new Vector(10, 50),
             debug: true
         })
     )
@@ -53,15 +64,13 @@ cam.zoomTo(1, () => {
 });
 cam.showBorders = false;
 
+var f = new Line(3, 2);
+var g = new Line(-3, -4);
+var h = new Line(1, 3);
+var j = new Line();
 
-var testV = new Vector(1, 0);
+j.setPerpendicularTo(f).setBfromPoint(new Vector(-0.6, 0.5));
 
-console.log(testV.angle, testV);
-testV.rotate(0)
-console.log(testV.angle, testV);
-
-
-
-console.log();
+console.log(f, j, j.crossesLineIn(f), f.angleBetween(g) * 180/Math.PI);
 
 

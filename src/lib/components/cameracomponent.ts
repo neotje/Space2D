@@ -14,13 +14,16 @@ export class CameraComponent extends Component {
     zoom: number = 0;
     showBorders: boolean = false;
     overflow: boolean = true;
+    backgroundColor: string = "#000000"
 
     private parentPos: Vector;
 
-    constructor(canvas: HTMLCanvasElement, name: string = "camera", viewport: ViewPort) {
+    constructor(canvas: HTMLCanvasElement, name: string = "camera", viewport: ViewPort, color?: string) {
         super(name, "CameraComponent");
 
         this.viewport = viewport;
+
+        this.backgroundColor = (color) ? color : this.backgroundColor;
     }
 
     worldPosToViewport(v: Vector): Vector {

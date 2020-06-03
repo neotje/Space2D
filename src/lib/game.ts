@@ -25,6 +25,14 @@ interface Statistics {
     speed: number;
 }
 
+export function setSpeed(s: number) {
+    speed = s;
+}
+
+export function getSpeed(): number {
+    return speed;
+}
+
 export function parentOf(obj: GameObject): GameObject {
 
     function loop(o: GameObject): GameObject {        
@@ -75,6 +83,10 @@ function update() {
     renderer.clear();
 
     if (!pause) {
+        root.foreachGameObject((object: GameObject) => {
+            object.loopStart();
+        });
+
         root.foreachGameObject((object: GameObject) => {
             object.update();
         });

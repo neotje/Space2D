@@ -2,7 +2,7 @@ import { Component } from "../component";
 import { Vector } from "../vector";
 import { getDeltaTime, root, renderer } from "../game";
 import { Constants } from "../physics/constants";
-import { roundTo } from "../physics/formulas";
+import { roundTo, gravityForce } from "../physics/formulas";
 import { GameObject } from "../gameobject";
 
 interface PhysicalProperties {
@@ -11,68 +11,91 @@ interface PhysicalProperties {
     debug?: boolean;
 }
 
+interface Constrains {
+    x: boolean;
+    y: boolean;
+}
+
 export class PhysicsComponent extends Component {
 
     mass: number;
     velocity: Vector;
     a: Vector;
-    f: Vector;
+    f: Vector = new Vector(0, 0);
     debug: boolean;
+    constrains: Constrains = {
+        x: false,
+        y: false
+    }
 
     private debugPoints: Vector[] = [];
     private t: number = 0;
     private heaviestBody: PhysicsComponent;
 
-    constructor(name: string, props: PhysicalProperties) {
+    constructor(name: string, props: PhysicalProperties, constrains?: Constrains) {
         super(name, "PhysicsComponent");
 
         this.mass = props.mass;
         this.velocity = (props.velocity) ? props.velocity : new Vector(0, 0);
-        this.debug = (props.debug) ? props.debug : false;        
+        this.debug = (props.debug) ? props.debug : false;
+        this.constrains = (constrains) ? constrains : this.constrains; 
+    }
+
+    loopStart() {
+        this.f = new Vector(0, 0);
     }
 
     update() {
         var dt = getDeltaTime();
-        this.f = new Vector(0, 0);
         
+        // save some debug data
         if (this.debug) {
             this.t += dt;
 
-            if (this.t > 0.5) {                                
+            if (this.t > 0.01) {                                
                 this.debugPoints.push(this.parent.worldPosition);
                 this.t = 0;
             }
         }
-
+        
+        // get all physics components
         var components: PhysicsComponent[] = root.findComponent('.' + this.type);
         
         for (const component of components) {
             if (component.id != this.id) {
-                var Fg = Constants.G * (
-                    (this.mass * component.mass) / 
-                    Math.pow(Math.abs(this.parent.worldPosition.distanceTo(component.parent.worldPosition)), 2)
-                );
+                var Fg = gravityForce(this.mass, component.mass, Math.abs(this.parent.worldPosition.distanceTo(component.parent.worldPosition)));
 
                 if (!this.heaviestBody) {
                     this.heaviestBody = component;
                 }
-
                 if (component.mass > this.heaviestBody.mass) {
                     this.heaviestBody = component;
                 }
 
                 var angle = this.parent.worldPosition.lookAt(component.parent.worldPosition).angle;
 
-                this.f.add(new Vector(2*Fg, 0).rotateBy(angle))
+                var FgV = new Vector(2*Fg, 0);
+                FgV.angle = angle;
+
+                this.f.add(FgV)
 
                 //ddconsole.log(this.parent.id, Fg);          
             }
         }
-        //this.parent.position.add(this.velocity.copy().scale(dt));
+        
 
-        this.a = this.f.divide(this.mass);
+        var dt = getDeltaTime();
+
+        this.a = this.f.copy().divide(this.mass);
 
         this.velocity.add(this.a.copy().scale(dt));
+
+        if (this.constrains.x) {
+            this.velocity.x = 0;
+        }
+        if (this.constrains.y) {
+            this.velocity.y = 0;
+        }
 
         this.parent.worldPosition = this.parent.worldPosition.add(this.velocity.copy().scale(dt));
     }
@@ -103,7 +126,7 @@ export class PhysicsComponent extends Component {
                 renderer.drawPointList(this.debugPoints);
             }
     
-            if (this.debugPoints.length > 30) {
+            if (this.debugPoints.length > 250) {
                 this.debugPoints.shift();
             }
 

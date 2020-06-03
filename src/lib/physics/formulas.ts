@@ -18,6 +18,10 @@ export function escapeVelocityVector(M: number, p1: Vector, p2: Vector): Vector 
     return V;
 }
 
+export function gravityForce(M: number, m: number, r: number): number {
+    return Constants.G * ((M * m) / (r * r));
+}
+
 export function roundTo(n: number, d: number) {
     return Math.round((n + Number.EPSILON) * Math.pow(10, d)) / Math.pow(10, d);
 }

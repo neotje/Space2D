@@ -4,10 +4,18 @@ export function vector(x: number, y: number): Vector {
     return new Vector(x, y);
 }
 
+/**
+ * Vector class
+ */
 export class Vector {
     public x: number;
     public y: number;
 
+    /**
+     * Make new vector 2D with a X and Y value
+     * @param x number
+     * @param y number
+     */
     constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
