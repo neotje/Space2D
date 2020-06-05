@@ -14,6 +14,8 @@ interface GameObjectOptions {
     scale?: Vector;
 
     color?: string;
+
+    debug?: boolean;
 }
 
 export class GameObject {
@@ -25,6 +27,8 @@ export class GameObject {
     scale: Vector;
 
     color: string;
+
+    debug: boolean;
 
     parent: GameObject;
     children: GameObject[] = [];
@@ -39,6 +43,7 @@ export class GameObject {
         this.rotation = (opt.rotation) ? opt.rotation : 0;
         this.scale = (opt.scale) ? opt.scale : new Vector(1, 1);
         this.color = (opt.color) ? opt.color : "#fff";
+        this.debug = (opt.debug) ? opt.debug : false;
     }
 
     get worldPosition(): Vector {

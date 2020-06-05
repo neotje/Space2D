@@ -2,7 +2,7 @@ import { Vector } from "../vector";
 import { GameObject } from "../gameobject";
 import { renderer } from "../game";
 
-class Circle {
+export class Circle {
     radius: number;
 
     constructor(radius: number) {

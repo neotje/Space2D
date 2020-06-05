@@ -6,6 +6,7 @@ import { PhysicsComponent } from './lib/components/physicscomponent';
 import { escapeVelocityVector } from './lib/physics/formulas';
 import { BasicMovementComponent } from './lib/components/basicmovementcomponent';
 import { Line } from "./lib/math";
+import { Polygon } from "./lib/shapes";
 
 
 root.addChild(
@@ -24,7 +25,7 @@ root.addChild(
     new GameObject({ name: 'sun', position: new Vector(0, 0), rotation: 0 }).addComponent(
         new PhysicsComponent('physics', {
             mass: 1.989e15,
-            debug: true
+            debug: false
         }, {
             x: true,
             y: true
@@ -34,21 +35,21 @@ root.addChild(
         new PhysicsComponent('obj2', {
             mass: 0.33e12,
             velocity: escapeVelocityVector(1.989e15, new Vector(0, 0), new Vector(100, 0)).add(new Vector(0, 0)),
-            debug: true
+            debug: false
         })
     ),
     new GameObject({ name: 'planet 2', position: new Vector(-200, 0), rotation: 0 }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 5.972e12,
             velocity: escapeVelocityVector(1.989e15, new Vector(0, 0), new Vector(200, 0)).add(new Vector(0, 0)),
-            debug: true
+            debug: false
         })
     ),
     new GameObject({ name: 'exoplanet 3', position: new Vector(0, -250), rotation: 0 }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 5.972e12,
             velocity: new Vector(10, 50),
-            debug: true
+            debug: false
         })
     )
 )
@@ -64,13 +65,16 @@ cam.zoomTo(1, () => {
 });
 cam.showBorders = false;
 
-var f = new Line(3, 2);
-var g = new Line(-3, -4);
-var h = new Line(1, 3);
-var j = new Line();
+//var f = new Line(3, 2);
+//var g = new Line(-3, -4);
+//var h = new Line(1, 3);
+var j = new Line(1).setBfromPoint(new Vector(-2, 1));
+var poly = new Polygon([
+    new Vector(2, 1),
+    new Vector(1, 1),
+    new Vector(-1,2),
+    new Vector(-1, -1),
+    new Vector(1, -2)
+]);
 
-j.setPerpendicularTo(f).setBfromPoint(new Vector(-0.6, 0.5));
-
-console.log(f, j, j.crossesLineIn(f), f.angleBetween(g) * 180/Math.PI);
-
-
+console.log(j, poly.isPointInside(new Vector(0, 1)));

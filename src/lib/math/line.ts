@@ -6,11 +6,14 @@ export class Line {
 
     constructor(d?: number, b?: number) {
         this.d = (d) ? d : undefined;
-        this.b = (b) ? b : undefined; 
+        this.b = (b) ? b : undefined;
     }
 
     get angle(): number {
         return Math.atan(this.d);
+    }
+    get direction(): number {
+        return this.d;
     }
 
     setDirection(d: number): this {
@@ -19,6 +22,7 @@ export class Line {
     }
     setDirectionFromPoints(a: Vector, b: Vector): this {
         this.d = (a.y - b.y) / (a.x - b.x);
+        this.setBfromPoint(a);
         return this;
     }
     mirror(): this {
@@ -32,9 +36,18 @@ export class Line {
     isPerpendicularTo(l: Line): Boolean {
         if (this.d == 1 / -l.d) {
             return true;
-        } else {
-            return false;
         }
+        return false;
+    }
+    setParallelTo(l: Line): this {
+        this.d = l.d;
+        return this;
+    }
+    isParallelTo(l: Line): Boolean {
+        if (l.d == this.d) {
+            return true
+        }
+        return false
     }
 
     setB(b: number): this {
@@ -51,13 +64,44 @@ export class Line {
     }
 
     crossesLineIn(l: Line): Vector {
-        var x = (l.b - this.b) / (this.d - l.d);        
+        var x = (l.b - this.b) / (this.d - l.d);
         var y = this.getY(x);
         return new Vector(x, y);
+    }
+    crossesLineSection(a: Vector, b: Vector): Vector {        
+        if (a.x == b.x) {
+            var y = this.getY(a.x);
+            if (y >= Math.min(a.y, b.y) && y <= Math.max(a.y, b.y)) {
+                return new Vector(a.x, y);
+            }
+            return undefined
+        }
+        if (a.y == b.y) {
+            var x = this.getX(a.y);
+            if (x >= Math.min(a.x, b.x) && x <= Math.max(a.x, b.x)) {
+                return new Vector(x, a.y);
+            }
+            return undefined
+        }
+
+        var l = new Line().setDirectionFromPoints(a, b);
+        var cross = this.crossesLineIn(l);
+
+        if (
+            cross.x >= Math.min(a.x, b.x) && cross.x <= Math.max(a.x, b.x) &&
+            cross.y >= Math.min(a.y, b.y) && cross.y <= Math.max(a.y, b.y)
+        ) {
+            return cross;
+        }
+        return undefined;
     }
 
     getY(x: number): number {
         return this.d * x + this.b;
+    }
+
+    getX(y: number): number {
+        return (-this.b + y) / this.d;
     }
 
     angleBetween(l: Line): number {

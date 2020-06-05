@@ -102,10 +102,19 @@ export class Renderer {
                     object.color = this.randomColor();
                 }
                 this.drawPoint(object.worldPosition, object.color, 3);
-
-                this.drawText(object.worldPosition, new Vector(0, 15), `#${object.id} ${object.name}`);
-            })
+            });
         }
+
+        root.foreachGameObject((object: GameObject) => {
+            if (!object.color) {
+                object.color = this.randomColor();
+            }
+            this.drawPoint(object.worldPosition, object.color, 3);
+
+            if (object.debug) {
+                this.drawText(object.worldPosition, new Vector(0, 15), `#${object.id} ${object.name}`);
+            }
+        });
 
         if (this.options.drawStats) {
             this.drawStatistics();
