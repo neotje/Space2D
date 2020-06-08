@@ -1,8 +1,6 @@
-import { Vector } from './vector';
+import { Vector } from '../math/vector';
 import { Component } from './component';
-import { MeshComponent } from './components/meshcomponent';
-import { root, parentOf } from './game';
-import anime from './anime.es';
+import anime from '../anime.es';
 
 var lastID = 0;
 

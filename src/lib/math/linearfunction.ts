@@ -1,6 +1,6 @@
-import { Vector } from "../vector";
+import { Vector } from "../math";
 
-export class Line {
+export class LinearFunction {
     d: number;
     b: number;
 
@@ -29,21 +29,21 @@ export class Line {
         this.d *= -1;
         return this;
     }
-    setPerpendicularTo(l: Line): this {
+    setPerpendicularTo(l: LinearFunction): this {
         this.d = 1 / -l.d;
         return this;
     }
-    isPerpendicularTo(l: Line): Boolean {
+    isPerpendicularTo(l: LinearFunction): Boolean {
         if (this.d == 1 / -l.d) {
             return true;
         }
         return false;
     }
-    setParallelTo(l: Line): this {
+    setParallelTo(l: LinearFunction): this {
         this.d = l.d;
         return this;
     }
-    isParallelTo(l: Line): Boolean {
+    isParallelTo(l: LinearFunction): Boolean {
         if (l.d == this.d) {
             return true
         }
@@ -63,7 +63,7 @@ export class Line {
         }
     }
 
-    crossesLineIn(l: Line): Vector {
+    crossesLineIn(l: LinearFunction): Vector {
         var x = (l.b - this.b) / (this.d - l.d);
         var y = this.getY(x);
         return new Vector(x, y);
@@ -84,7 +84,7 @@ export class Line {
             return undefined
         }
 
-        var l = new Line().setDirectionFromPoints(a, b);
+        var l = new LinearFunction().setDirectionFromPoints(a, b);
         var cross = this.crossesLineIn(l);
 
         if (
@@ -104,7 +104,7 @@ export class Line {
         return (-this.b + y) / this.d;
     }
 
-    angleBetween(l: Line): number {
+    angleBetween(l: LinearFunction): number {
         return Math.atan((this.d - l.d) / (1 + (this.d * l.d)));
     }
 }

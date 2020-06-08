@@ -1,11 +1,11 @@
 import { root, parentOf, start, renderer } from './lib/game';
-import { GameObject } from './lib/gameobject';
-import { Vector } from './lib/vector';
+import { GameObject } from './lib/game';
+import { Vector } from './lib/math';
 import { CameraComponent } from './lib/components/cameracomponent';
 import { PhysicsComponent } from './lib/components/physicscomponent';
-import { escapeVelocityVector } from './lib/physics/formulas';
+import { escapeVelocityVector } from './lib/physics';
 import { BasicMovementComponent } from './lib/components/basicmovementcomponent';
-import { Line } from "./lib/math";
+import { LinearFunction as Line } from "./lib/math";
 import { Polygon } from "./lib/shapes";
 
 
@@ -35,21 +35,21 @@ root.addChild(
         new PhysicsComponent('obj2', {
             mass: 0.33e12,
             velocity: escapeVelocityVector(1.989e15, new Vector(0, 0), new Vector(100, 0)).add(new Vector(0, 0)),
-            debug: false
+            debug: true
         })
     ),
     new GameObject({ name: 'planet 2', position: new Vector(-200, 0), rotation: 0 }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 5.972e12,
             velocity: escapeVelocityVector(1.989e15, new Vector(0, 0), new Vector(200, 0)).add(new Vector(0, 0)),
-            debug: false
+            debug: true
         })
     ),
     new GameObject({ name: 'exoplanet 3', position: new Vector(0, -250), rotation: 0 }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 5.972e12,
             velocity: new Vector(10, 50),
-            debug: false
+            debug: true
         })
     )
 )

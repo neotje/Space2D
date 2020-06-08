@@ -1,6 +1,6 @@
-import { CameraComponent } from "./components/cameracomponent";
-import { root, getStatistics } from "./game";
-import { Vector } from "./vector";
+import { CameraComponent } from "../components/cameracomponent";
+import { root, getStatistics } from "../game";
+import { Vector } from "../math/vector";
 import { GameObject } from "./gameobject";
 
 interface RendererOptions {

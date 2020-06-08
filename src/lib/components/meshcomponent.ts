@@ -1,5 +1,5 @@
-import { Component } from "../component";
-import { Vector } from "../vector";
+import { Component } from "../game/component";
+import { Vector } from "../math/vector";
 import { renderer } from "../game";
 
 export class MeshComponent extends Component {

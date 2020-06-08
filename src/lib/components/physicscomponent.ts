@@ -1,9 +1,8 @@
-import { Component } from "../component";
-import { Vector } from "../vector";
+import { Component } from "../game/component";
+import { Vector } from "../math/vector";
 import { getDeltaTime, root, renderer } from "../game";
-import { Constants } from "../physics/constants";
-import { roundTo, gravityForce } from "../physics/formulas";
-import { GameObject } from "../gameobject";
+import { gravityForce } from "../physics";
+import { roundTo } from "../math";
 
 interface PhysicalProperties {
     mass: number;

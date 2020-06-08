@@ -1,6 +1,9 @@
-import { GameObject } from "./gameobject";
-import { Vector } from "./vector";
-import { Renderer } from "./renderer";
+export { GameObject } from "./game/gameobject";
+export { Renderer } from "./game/renderer";
+
+import { GameObject } from "./game";
+import { Vector } from "./math";
+import { Renderer } from "./game";
 
 export var root = new GameObject({name: "root", position: new Vector(0, 0), color: "#ff0000"});
 export var renderer = new Renderer(document.querySelector('#game'), {

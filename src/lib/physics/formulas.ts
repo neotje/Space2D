@@ -1,5 +1,5 @@
 import { Constants } from "./constants";
-import { Vector } from "../vector";
+import { Vector } from "../math";
 
 
 export function escapeVelocity(M: number, r: number): number {
@@ -20,8 +20,4 @@ export function escapeVelocityVector(M: number, p1: Vector, p2: Vector): Vector 
 
 export function gravityForce(M: number, m: number, r: number): number {
     return Constants.G * ((M * m) / (r * r));
-}
-
-export function roundTo(n: number, d: number) {
-    return Math.round((n + Number.EPSILON) * Math.pow(10, d)) / Math.pow(10, d);
 }

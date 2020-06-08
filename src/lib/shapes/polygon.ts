@@ -1,5 +1,5 @@
-import { Vector } from "../vector";
-import { Line } from "../math";
+import { Vector } from "../math/vector";
+import { LinearFunction as Line } from "../math";
 
 export class Polygon {
     points: Vector[];

@@ -1,4 +1,4 @@
-import anime from "./anime.es";
+import anime from "../anime.es";
 
 export function vector(x: number, y: number): Vector {
     return new Vector(x, y);

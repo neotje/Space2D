@@ -1,4 +1,4 @@
-import { Component } from "../component";
+import { Component } from "../game/component";
 import { getDeltaTime, renderer, setSpeed, getSpeed } from "../game";
 
 export class BasicMovementComponent extends Component {

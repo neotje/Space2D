@@ -1,6 +1,4 @@
-import { Vector } from "../vector";
-import { GameObject } from "../gameobject";
-import { renderer } from "../game";
+import { GameObject } from "../game/gameobject";
 
 export class Circle {
     radius: number;

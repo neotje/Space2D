@@ -1,7 +1,6 @@
-import { Component } from "../component";
-import { Vector } from "../vector";
+import { Component } from "../game/component";
+import { Vector } from "../math/vector";
 import anime from "../anime.es";
-import { renderer } from "../game";
 
 interface ViewPort {
     width: number;
