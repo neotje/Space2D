@@ -4,10 +4,10 @@ import { Vector } from "../math/vector";
 import { GameObject } from "./gameobject";
 
 interface RendererOptions {
-    drawTransforms?: boolean;
     imageSmoothing?: boolean;
     smoothingQuality?: "low" | "medium" | "high";
     drawStats?: boolean;
+    vsync?: boolean;
 }
 
 interface line {
@@ -65,11 +65,17 @@ for (const camera of this.cameras) {
 }
 */
 
+var startTime = 0;
+
 export class Renderer {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     options: RendererOptions;
     cameras: CameraComponent[];
+
+    frame: number = 0;
+    fps: number = 0;
+    dt: number = 0;
 
     constructor(canvas: HTMLCanvasElement, options?: RendererOptions) {
         this.options = options;
@@ -83,7 +89,17 @@ export class Renderer {
         this.canvas.height = document.querySelector('body').clientHeight;
     }
 
+    start() {
+        startTime = performance.now();
+        this.update();
+    }
+
     update() {
+        var endTime = performance.now();
+        this.dt = (endTime - startTime) / 1000;
+        this.fps = 1 / this.dt;
+        startTime = performance.now();
+
         this.cameras = root.findComponent('.CameraComponent');
 
         for (const camera of this.cameras) {
@@ -95,30 +111,34 @@ export class Renderer {
             }
         }
 
-        if (this.options.drawTransforms) {
-            this.drawPoint(root.worldPosition, root.color, 5);
-            root.foreachGameObject((object: GameObject) => {
+        if (this.options.drawStats) {
+            this.drawStatistics();
+        }
+
+        root.foreachGameObject((object: GameObject) => {
+            if (object.debug) {
                 if (!object.color) {
                     object.color = this.randomColor();
                 }
                 this.drawPoint(object.worldPosition, object.color, 3);
-            });
-        }
 
-        root.foreachGameObject((object: GameObject) => {
-            if (!object.color) {
-                object.color = this.randomColor();
-            }
-            this.drawPoint(object.worldPosition, object.color, 3);
-
-            if (object.debug) {
                 this.drawText(object.worldPosition, new Vector(0, 15), `#${object.id} ${object.name}`);
             }
+
+            object.drawUpdate();
         });
 
-        if (this.options.drawStats) {
-            this.drawStatistics();
+        this.frame++;
+        if (this.options.vsync) {
+            window.requestAnimationFrame(() => {
+                this.update();
+            });
+        } else {
+            setTimeout(() => {
+                this.update();
+            }, 0);
         }
+        
     }
 
     randomColor(): string {
@@ -128,9 +148,10 @@ export class Renderer {
     drawStatistics(): void {
         var stats = getStatistics();
         this.ctx.fillStyle = "#fff"
-        this.ctx.fillText(`fps: ${Math.round(stats.fps)} `, 10, 10);
-        this.ctx.fillText(`dt: ${stats.deltaTime}`, 10, 24);
-        this.ctx.fillText(`speed: ${stats.speed}`, 10, 38);
+        this.ctx.fillText(`fps: ${Math.round(this.fps)} `, 10, 10);
+        this.ctx.fillText(`draw dt: ${this.dt}`, 10, 24);
+        this.ctx.fillText(`game dt: ${stats.deltaTime}`, 10, 38);
+        this.ctx.fillText(`speed: ${stats.speed}`, 10, 52);
     }
 
     drawText(pos: Vector, offset: Vector, text: string): void {
@@ -153,7 +174,7 @@ export class Renderer {
 
     drawLine(opt: line): void {
         this.ctx.strokeStyle = (!opt.color) ? "#fff" : opt.color;
-        this.ctx.lineWidth = (!opt.width) ? 1 : opt.width;        
+        this.ctx.lineWidth = (!opt.width) ? 1 : opt.width;
 
         for (const camera of this.cameras) {
             var start = camera.worldPosToCanvas(opt.start);
@@ -168,7 +189,7 @@ export class Renderer {
     }
 
     drawRect(opt: rectangle) {
-        for( const camera of this.cameras) {
+        for (const camera of this.cameras) {
             var start = camera.worldPosToCanvas(opt.start);
             var end = (!opt.end) ? camera.worldPosToCanvas(opt.start.copy().add(new Vector(opt.width, opt.height))) : camera.worldPosToCanvas(opt.end);
             var difference = start.difference(end);
@@ -181,7 +202,7 @@ export class Renderer {
                 this.ctx.fillStyle = (!opt.fill.color) ? "#fff" : opt.fill.color;
                 this.ctx.fill();
             }
-    
+
             if (opt.stroke) {
                 this.ctx.lineWidth = (!opt.stroke.width) ? 1 : opt.stroke.width;
                 this.ctx.strokeStyle = (!opt.stroke.color) ? "#ff0000" : opt.stroke.color;
@@ -191,7 +212,7 @@ export class Renderer {
     }
 
     drawCircle(circle: circle): void {
-        for( const camera of this.cameras) {
+        for (const camera of this.cameras) {
             var start = camera.worldPosToCanvas(circle.pos);
             var radius = camera.zoom * circle.radius;
 
@@ -203,13 +224,13 @@ export class Renderer {
                 this.ctx.fillStyle = (!circle.fill.color) ? "#fff" : circle.fill.color;
                 this.ctx.fill();
             }
-    
+
             if (circle.stroke) {
                 this.ctx.lineWidth = (!circle.stroke.width) ? 1 : circle.stroke.width;
                 this.ctx.strokeStyle = (!circle.stroke.color) ? "#ff0000" : circle.stroke.color;
                 this.ctx.stroke();
             }
-        }  
+        }
     }
 
     drawEllipse(ellipse: ellipse): void {
@@ -218,14 +239,14 @@ export class Renderer {
             var radius = ellipse.radius;
 
             this.ctx.beginPath();
-            this.ctx.ellipse(center.x, center.y, radius.x, radius.y, 0, 0, 2*Math.PI);
+            this.ctx.ellipse(center.x, center.y, radius.x, radius.y, 0, 0, 2 * Math.PI);
             this.ctx.closePath();
 
             if (ellipse.fill) {
                 this.ctx.fillStyle = (!ellipse.fill.color) ? "#fff" : ellipse.fill.color;
                 this.ctx.fill();
             }
-    
+
             if (ellipse.stroke) {
                 this.ctx.lineWidth = (!ellipse.stroke.width) ? 1 : ellipse.stroke.width;
                 this.ctx.strokeStyle = (!ellipse.stroke.color) ? "#ff0000" : ellipse.stroke.color;
@@ -251,7 +272,7 @@ export class Renderer {
                 this.ctx.fillStyle = (!polygon.fill.color) ? "#fff" : polygon.fill.color;
                 this.ctx.fill();
             }
-    
+
             if (polygon.stroke) {
                 this.ctx.lineWidth = (!polygon.stroke.width) ? 1 : polygon.stroke.width;
                 this.ctx.strokeStyle = (!polygon.stroke.color) ? "#ff0000" : polygon.stroke.color;

@@ -3,11 +3,11 @@ import { Vector } from "../math/vector";
 import { getDeltaTime, root, renderer } from "../game";
 import { gravityForce } from "../physics";
 import { roundTo } from "../math";
+import { Circle, Polygon } from "../shapes";
 
 interface PhysicalProperties {
     mass: number;
     velocity?: Vector;
-    debug?: boolean;
 }
 
 interface Constrains {
@@ -21,11 +21,11 @@ export class PhysicsComponent extends Component {
     velocity: Vector;
     a: Vector;
     f: Vector = new Vector(0, 0);
-    debug: boolean;
     constrains: Constrains = {
         x: false,
         y: false
     }
+    collisionShape: Circle | Polygon = new Circle(10);
 
     private debugPoints: Vector[] = [];
     private t: number = 0;
@@ -36,7 +36,6 @@ export class PhysicsComponent extends Component {
 
         this.mass = props.mass;
         this.velocity = (props.velocity) ? props.velocity : new Vector(0, 0);
-        this.debug = (props.debug) ? props.debug : false;
         this.constrains = (constrains) ? constrains : this.constrains; 
     }
 
@@ -48,7 +47,7 @@ export class PhysicsComponent extends Component {
         var dt = getDeltaTime();
         
         // save some debug data
-        if (this.debug) {
+        if (this.parent.debug) {
             this.t += dt;
 
             if (this.t > 0.01) {                                
@@ -62,8 +61,10 @@ export class PhysicsComponent extends Component {
         
         for (const component of components) {
             if (component.id != this.id) {
+                // calculate gravity force
                 var Fg = gravityForce(this.mass, component.mass, Math.abs(this.parent.worldPosition.distanceTo(component.parent.worldPosition)));
 
+                // just for debugging purposes
                 if (!this.heaviestBody) {
                     this.heaviestBody = component;
                 }
@@ -71,14 +72,21 @@ export class PhysicsComponent extends Component {
                     this.heaviestBody = component;
                 }
 
+                // angle of the gravity force
                 var angle = this.parent.worldPosition.lookAt(component.parent.worldPosition).angle;
 
                 var FgV = new Vector(2*Fg, 0);
                 FgV.angle = angle;
-
+                
+                // apply force
                 this.f.add(FgV)
 
-                //ddconsole.log(this.parent.id, Fg);          
+                //ddconsole.log(this.parent.id, Fg);
+
+                // collision detection
+                if (this.collisionShape && component.collisionShape) {
+                    
+                }
             }
         }
         
@@ -102,7 +110,7 @@ export class PhysicsComponent extends Component {
     draw() {
         //console.log(this.debugPoints);
 
-        if (this.debug) {
+        if (this.parent.debug) {
             renderer.drawLine({
                 start: this.parent.worldPosition,
                 end: this.parent.worldPosition.add(this.velocity),
@@ -132,6 +140,10 @@ export class PhysicsComponent extends Component {
             if (this.heaviestBody) {
                 var r = this.parent.worldPosition.distanceTo(this.heaviestBody.parent.worldPosition);
                 renderer.drawText(this.parent.worldPosition, new Vector(0,29 + 4*14), `r: ${roundTo(r, 3)}`);
+            }
+
+            if (this.collisionShape) {
+                this.collisionShape.draw(this.parent.position);
             }
         }
         

@@ -8,9 +8,9 @@ import { Renderer } from "./game";
 export var root = new GameObject({name: "root", position: new Vector(0, 0), color: "#ff0000"});
 export var renderer = new Renderer(document.querySelector('#game'), {
     imageSmoothing: true, 
-    drawTransforms: true,
     drawStats: true,
-    smoothingQuality: "high"
+    smoothingQuality: "high",
+    vsync: true
 });
 
 export var pause: boolean = false;
@@ -60,9 +60,9 @@ export function parentOf(obj: GameObject): GameObject {
 
 export function start() {
     startTime = performance.now();
-    window.requestAnimationFrame(update);
 
-    //setInterval(update, 0)
+    update();
+    renderer.update();
 }
 
 export function getDeltaTime(): number {
@@ -83,8 +83,6 @@ function update() {
     fps = 1 / deltaTime;
     startTime = performance.now();    
 
-    renderer.clear();
-
     if (!pause) {
         root.foreachGameObject((object: GameObject) => {
             object.loopStart();
@@ -93,16 +91,10 @@ function update() {
         root.foreachGameObject((object: GameObject) => {
             object.update();
         });
-
-        renderer.update();
-
-        root.foreachGameObject((object: GameObject) => {
-            object.drawUpdate();
-        });
     }
 
     if (!stop) {
-        window.requestAnimationFrame(update);
+        setTimeout(update, 1);
     }
     return;
 }

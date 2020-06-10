@@ -22,34 +22,30 @@ root.addChild(
         ),
         new BasicMovementComponent('controller', 80)
     ),
-    new GameObject({ name: 'sun', position: new Vector(0, 0), rotation: 0 }).addComponent(
+    new GameObject({ name: 'sun', position: new Vector(0, 0), rotation: 0, debug: true }).addComponent(
         new PhysicsComponent('physics', {
-            mass: 1.989e15,
-            debug: false
+            mass: 1.989e15
         }, {
             x: true,
             y: true
         })
     ),
-    new GameObject({ name: 'planet 1', position: new Vector(100, 0), rotation: 0 }).addComponent(
+    new GameObject({ name: 'planet 1', position: new Vector(100, 0), rotation: 0, debug: true }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 0.33e12,
-            velocity: escapeVelocityVector(1.989e15, new Vector(0, 0), new Vector(100, 0)).add(new Vector(0, 0)),
-            debug: true
+            velocity: escapeVelocityVector(1.989e15, new Vector(0, 0), new Vector(100, 0)).add(new Vector(0, 0))
         })
     ),
-    new GameObject({ name: 'planet 2', position: new Vector(-200, 0), rotation: 0 }).addComponent(
+    new GameObject({ name: 'planet 2', position: new Vector(-200, 0), rotation: 0, debug: true }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 5.972e12,
-            velocity: escapeVelocityVector(1.989e15, new Vector(0, 0), new Vector(200, 0)).add(new Vector(0, 0)),
-            debug: true
+            velocity: escapeVelocityVector(1.989e15, new Vector(0, 0), new Vector(200, 0)).add(new Vector(0, 0))
         })
     ),
-    new GameObject({ name: 'exoplanet 3', position: new Vector(0, -250), rotation: 0 }).addComponent(
+    new GameObject({ name: 'exoplanet 3', position: new Vector(0, -250), rotation: 0, debug: true }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 5.972e12,
-            velocity: new Vector(10, 50),
-            debug: true
+            velocity: new Vector(10, 50)
         })
     )
 )

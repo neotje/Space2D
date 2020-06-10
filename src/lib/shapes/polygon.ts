@@ -1,5 +1,5 @@
 import { Vector } from "../math/vector";
-import { LinearFunction as Line } from "../math";
+import { LinearFunction } from "../math/linearfunction";
 
 export class Polygon {
     points: Vector[];
@@ -14,7 +14,7 @@ export class Polygon {
         return this;
     }
 
-    getLineIntersects(l: Line): Vector[] {
+    getLineIntersects(l: LinearFunction): Vector[] {
         var intersects: Vector[] = [];
 
         var start: Vector = this.points[this.points.length - 1];
@@ -42,7 +42,7 @@ export class Polygon {
     }
 
     isPointInside(p: Vector): boolean {
-        var allIntersects = this.getLineIntersects(new Line(1).setBfromPoint(p));
+        var allIntersects = this.getLineIntersects(new LinearFunction(1).setBfromPoint(p));
         var intersects: Vector[] = [];
 
         for (const i of allIntersects) {
@@ -70,6 +70,10 @@ export class Polygon {
             return true;
         }
         return false;
+    }
+
+    draw(pos: Vector): void {
+        
     }
 }
 

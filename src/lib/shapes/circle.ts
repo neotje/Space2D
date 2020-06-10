@@ -1,4 +1,7 @@
 import { GameObject } from "../game/gameobject";
+import { LinearFunction } from "../math/linearfunction";
+import { Vector } from "../math";
+import { renderer } from "../game";
 
 export class Circle {
     radius: number;
@@ -7,10 +10,24 @@ export class Circle {
         this.radius = radius;
     }
 
-    render(parent: GameObject) {
-        //renderer.drawEllipse({
-        //    pos: parent.worldPosition,
-        //    radius: new Vector(this.radius, this.radius).scaleX(parent.scale.x).scaleY(parent.scale.y)
-        //});
+    getLineIntersects(l: LinearFunction): Vector[] {
+        return []
+    }
+
+    isPointInside(p: Vector): boolean {
+        if (Math.abs(new Vector(0, 0).distanceTo(p)) <= this.radius) {
+            return true;
+        }
+        return false;
+    }
+
+    draw(pos: Vector): void {
+        renderer.drawCircle({
+            pos: pos,
+            radius: this.radius,
+            stroke: {
+                color: "#fff"
+            }
+        });
     }
 }
