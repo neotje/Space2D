@@ -1,5 +1,5 @@
 import { CameraComponent } from "../components/cameracomponent";
-import { root, getStatistics } from "../game";
+import { Game } from "../game";
 import { Vector } from "../math/vector";
 import { GameObject } from "./gameobject";
 
@@ -69,6 +69,9 @@ for (const camera of this.cameras) {
 
 var startTime = 0;
 
+/**
+ * @category Game
+ */
 export class Renderer {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
@@ -102,7 +105,7 @@ export class Renderer {
         this.fps = 1 / this.dt;
         startTime = performance.now();
 
-        this.cameras = root.findComponent('.CameraComponent');
+        this.cameras = Game.root.findComponent('.CameraComponent');
 
         for (const camera of this.cameras) {
             this.ctx.fillStyle = camera.backgroundColor;
@@ -117,17 +120,7 @@ export class Renderer {
             this.drawStatistics();
         }
 
-        root.foreachGameObject((object: GameObject) => {
-            if (object.debug) {
-                if (!object.color) {
-                    object.color = this.randomColor();
-                }
-                this.drawPoint(object.worldPosition, object.color, 3);
-
-                this.drawText(object.worldPosition, new Vector(0, 15), `#${object.id} ${object.name}`);
-                this.drawText(object.worldPosition, new Vector(0, 15 + 14), `x:${object.worldPosition.x} y:${object.worldPosition.y}`);
-            }
-
+        Game.root.foreachGameObject((object: GameObject) => {
             object.drawUpdate();
         });
 
@@ -144,12 +137,15 @@ export class Renderer {
 
     }
 
+    /**
+     * generate random color
+     */
     randomColor(): string {
         return "#" + Math.floor(Math.random() * 16777215).toString(16);
     }
 
     drawStatistics(): void {
-        var stats = getStatistics();
+        var stats = Game.getStatistics();
         this.ctx.fillStyle = "#fff"
         this.ctx.fillText(`fps: ${Math.round(this.fps)} `, 10, 10);
         this.ctx.fillText(`draw dt: ${this.dt}`, 10, 24);
@@ -157,6 +153,12 @@ export class Renderer {
         this.ctx.fillText(`speed: ${stats.speed}`, 10, 52);
     }
 
+    /**
+     * draw text on pos with an offset
+     * @param pos position
+     * @param offset offset
+     * @param text content
+     */
     drawText(pos: Vector, offset: Vector, text: string): void {
         for (const camera of this.cameras) {
             var pos = camera.worldPosToCanvas(pos).add(offset);
@@ -164,6 +166,12 @@ export class Renderer {
         }
     }
 
+    /**
+     * draw a dot on position with a thickness
+     * @param pos position
+     * @param color color
+     * @param thickness thickness in px
+     */
     drawPoint(pos: Vector, color: string, thickness: number): void {
         for (const camera of this.cameras) {
             var cpos = camera.worldPosToCanvas(pos);
@@ -175,6 +183,10 @@ export class Renderer {
         }
     }
 
+    /**
+     * draw line
+     * @param opt line
+     */
     drawLine(opt: line): void {
         this.ctx.strokeStyle = (!opt.color) ? "#fff" : opt.color;
         this.ctx.lineWidth = (!opt.width) ? 1 : opt.width;
@@ -191,6 +203,10 @@ export class Renderer {
         }
     }
 
+    /**
+     * draw rectangle
+     * @param opt rectangle
+     */
     drawRect(opt: rectangle) {
         for (const camera of this.cameras) {
             var start = camera.worldPosToCanvas(opt.start);
@@ -214,6 +230,10 @@ export class Renderer {
         }
     }
 
+    /**
+     * draw circle
+     * @param circle circle 
+     */
     drawCircle(circle: circle): void {
         for (const camera of this.cameras) {
             var start = camera.worldPosToCanvas(circle.pos);
@@ -236,6 +256,10 @@ export class Renderer {
         }
     }
 
+    /**
+     * draw ellipse
+     * @param ellipse 
+     */
     drawEllipse(ellipse: ellipse): void {
         for (const camera of this.cameras) {
             var center = camera.worldPosToCanvas(ellipse.pos);
@@ -258,6 +282,10 @@ export class Renderer {
         }
     }
 
+    /**
+     * draw polygon
+     * @param polygon 
+     */
     drawPolygon(polygon: polygon) {
         var angle = (polygon.angle) ? polygon.angle : 0;
         for (const p of polygon.points) {
@@ -289,6 +317,10 @@ export class Renderer {
         }
     }
 
+    /**
+     * draw line. mostly used for path debugging.
+     * @param points 
+     */
     drawPointList(points: Vector[]) {
         for (let i = 0; i < points.length; i++) {
             const p = points[i];
@@ -303,6 +335,9 @@ export class Renderer {
         }
     }
 
+    /**
+     * clear canvas
+     */
     clear(): void {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }

@@ -5,6 +5,9 @@ interface ShapeOptions {
     anchorY?: "top" | "center" | "bottom";
 }
 
+/**
+ * @category Shape
+ */
 class Shape {
     readonly points: Vector[];
     anchorX: "left" | "center" | "right";

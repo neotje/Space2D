@@ -8,6 +8,9 @@ interface ViewPort {
     position: Vector;
 }
 
+/**
+ * @category Component
+ */
 export class CameraComponent extends Component {
     viewport: ViewPort;
     zoom: number = 0;
@@ -25,14 +28,27 @@ export class CameraComponent extends Component {
         this.backgroundColor = (color) ? color : this.backgroundColor;
     }
 
+    /**
+     * convert world position to viewport position.
+     * @param v 
+     */
     worldPosToViewport(v: Vector): Vector {
         return this.parentPos.difference(v).scale(this.zoom).add(new Vector(this.viewport.width / 2, this.viewport.height / 2));
     }
 
+    /**
+     * convert world position to canvas position.
+     * @param v 
+     */
     worldPosToCanvas(v: Vector): Vector {
         return this.viewport.position.copy().add(this.worldPosToViewport(v));
     }
 
+    /**
+     * animated zooming to a value
+     * @param z target
+     * @param callback 
+     */
     zoomTo(z: number, callback: Function = function(){}) {
         anime({
             targets: this,

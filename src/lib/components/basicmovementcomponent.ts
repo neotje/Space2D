@@ -1,6 +1,9 @@
 import { Component } from "../game/component";
-import { getDeltaTime, renderer, setSpeed, getSpeed } from "../game";
+import { Game } from "../game";
 
+/**
+ * @category Component
+ */
 export class BasicMovementComponent extends Component {
     speed: number;
 
@@ -55,15 +58,15 @@ export class BasicMovementComponent extends Component {
             
 
             if (key == '=') {
-                setSpeed(getSpeed() + 1);
+                Game.setSpeed(Game.getSpeed() + 1);
             }
             if (key == '-') {
-                setSpeed(getSpeed() - 1);
+                Game.setSpeed(Game.getSpeed() - 1);
             }
         })
 
         window.addEventListener('wheel', (e) => {            
-            for (const c of renderer.cameras) {
+            for (const c of Game.renderer.cameras) {
                 console.log(c.zoom, c.zoom / e.deltaY);
                 
                 c.zoom -= c.zoom / e.deltaY
@@ -76,7 +79,7 @@ export class BasicMovementComponent extends Component {
     }
 
     update() {
-        var dt = getDeltaTime();        
+        var dt = Game.getDeltaTime();        
 
         if (this.up) {
             this.parent.position.y -= this.speed * dt;

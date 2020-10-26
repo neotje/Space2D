@@ -2,11 +2,15 @@ import { GameObject } from "./gameobject";
 
 var lastID = 0;
 
+/**
+ * @category Component
+ */
 export class Component {
     readonly id: number; // unique component id
     name: string; // component name is not unique
     type: string; // component type
     parent: GameObject; // component parent gameobject
+    enable: boolean = true;
 
     constructor(name: string, type: string) {
         this.id = lastID;

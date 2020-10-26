@@ -1,6 +1,11 @@
 {
-    "inputFiles": ["./src"],
-    "mode": "modules",
+    "inputFiles": "./src/lib",
+    "mode": "file",
     "out": "docs",
-    "excludeNotExported": true
+    "excludeNotExported": true,
+    "excludeExternals": true,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "theme": "default",
+    "exclude": "**/*+(anime.es).js"
 }

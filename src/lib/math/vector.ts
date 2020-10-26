@@ -5,7 +5,7 @@ export function vector(x: number, y: number): Vector {
 }
 
 /**
- * Vector class
+ * @category Math
  */
 export class Vector {
     public x: number;
@@ -46,31 +46,55 @@ export class Vector {
         this.angle = -this.angle;
         return this;
     }
+    /**
+     * Mirror with other vector as mirrorline.
+     * @param n other vector
+     */
     mirrorWith(n: Vector): this {
         this.angle = n.angle + (Math.PI - (this.angle - n.angle));
         return this;
     }
 
+    /**
+     * Check if this vector is equel to other vector.
+     * @param v other vector
+     */
     equalTo(v: Vector): Boolean {
         return this.x == v.x && this.y == v.y;
     }
 
+    /**
+     * vector addition.
+     * @param v 
+     */
     add(v: Vector): this {
         this.x += v.x;
         this.y += v.y;
         return this;
     }
 
+    /**
+     * vector substraction
+     * @param v 
+     */
     subtract(v: Vector): this {
         this.x -= v.x;
         this.y -= v.y;
         return this;
     }
 
+    /**
+     * return difference between vectors as new vector.
+     * @param v 
+     */
     difference(v: Vector): Vector {
         return v.copy().subtract(this);
     }
 
+    /**
+     * vector scaling
+     * @param s 
+     */
     scale(s: number): this {
         this.x *= s;
         this.y *= s;
@@ -94,6 +118,10 @@ export class Vector {
         return this;
     }
 
+    /**
+     * Calculate distance between two vectors.
+     * @param v 
+     */
     distanceTo(v: Vector): number {
         var v1 = this.difference(v);
         return v1.magnitude;
@@ -107,11 +135,20 @@ export class Vector {
         
     }
 
+    /**
+     * rotate this vector angle by a
+     * @param a angle in radians
+     */
     rotateBy(a: number): this {
         this.angle = this.angle + a;
         return this;
     }
 
+    /**
+     * animated {@link Vector.rotateBy}
+     * @param a 
+     * @param duration 
+     */
     rotate(a: number, duration?: number): this {
         if (duration) {
             anime({
@@ -126,6 +163,10 @@ export class Vector {
         }
     }
 
+    /**
+     * rotate this vector to point at the other vector
+     * @param v 
+     */
     lookAt(v: Vector): this {
         this.angle = this.difference(v).angle;
         return this;

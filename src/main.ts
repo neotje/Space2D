@@ -1,4 +1,4 @@
-import { root, parentOf, start, renderer } from './lib/game';
+import { Game } from './lib/game';
 import { GameObject } from './lib/game';
 import { Vector } from './lib/math';
 import { CameraComponent } from './lib/components/cameracomponent';
@@ -7,16 +7,17 @@ import { firstCosmicVelocityVector } from './lib/physics';
 import { BasicMovementComponent } from './lib/components/basicmovementcomponent';
 import { LinearFunction as Line } from "./lib/math";
 import { Polygon } from "./lib/shapes";
+import { DebugComponent } from './lib/components/debugcomponent';
 
 
-root.addChild(
+Game.root.addChild(
     new GameObject({ name: "player", position: new Vector(1, 0) }).addComponent(
         new CameraComponent(
             document.querySelector("#game"),
             'camera1',
             {
-                width: renderer.canvas.width,
-                height: renderer.canvas.height,
+                width: Game.renderer.canvas.width,
+                height: Game.renderer.canvas.height,
                 position: new Vector(0, 0)
             }
         ),
@@ -28,13 +29,15 @@ root.addChild(
         }, {
             x: false,
             y: false
-        })
+        }),
+        new DebugComponent('debug')
     ),
     new GameObject({ name: 'planet 1', position: new Vector(100, 0), rotation: 0, debug: true }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 0.33e12,
             velocity: firstCosmicVelocityVector(1.989e15, new Vector(0, 0), new Vector(100, 0)).add(new Vector(0, 0))
-        })
+        }),
+        new DebugComponent('debug')
     ),
     new GameObject({ name: 'planet 2', position: new Vector(-200, 0), rotation: 0, debug: true }).addComponent(
         new PhysicsComponent('obj2', {
@@ -46,17 +49,19 @@ root.addChild(
                 new Vector(-10,-10),
                 new Vector(-10, 10)
             ])
-        })
+        }),
+        new DebugComponent('debug')
     ),
     new GameObject({ name: 'exoplanet 3', position: new Vector(0, -250), rotation: 0, debug: true }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 5.972e12,
             velocity: new Vector(0, 0)
-        })
+        }),
+        new DebugComponent('debug')
     )
 )
 
-console.log(root);
+console.log(Game.root);
 
 
 var v: Vector = new Vector(-0.5, 1);
@@ -65,10 +70,10 @@ console.log(v);
 console.log(v.mirrorWith(new Vector(1, 0)));
 
 
-start();
+Game.start();
 
 
-var cam: CameraComponent = root.findComponent('.CameraComponent')[0];
+var cam: CameraComponent = Game.root.findComponent('.CameraComponent')[0];
 cam.zoomTo(1, () => {
     cam.zoomTo(1);
 });

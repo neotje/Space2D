@@ -1,7 +1,10 @@
 import { Vector } from "../math/vector";
 import { LinearFunction } from "../math/linearfunction";
-import { renderer } from "../game";
+import { Game } from "../game";
 
+/**
+ * @category Shape
+ */
 export class Polygon {
     points: Vector[];
     center: Vector = new Vector(0, 0);
@@ -90,7 +93,7 @@ export class Polygon {
             points.push(p.copy());
         }        
 
-        renderer.drawPolygon({
+        Game.renderer.drawPolygon({
             pos: pos,
             points: points,
             angle: 0,

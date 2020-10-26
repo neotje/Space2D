@@ -1,6 +1,7 @@
 import { Vector } from '../math/vector';
 import { Component } from './component';
 import anime from '../anime.es';
+import { DebugComponent } from '../components/debugcomponent';
 
 var lastID = 0;
 
@@ -16,6 +17,9 @@ interface GameObjectOptions {
     debug?: boolean;
 }
 
+/**
+ * @category Game
+ */
 export class GameObject {
     readonly id: number; // unique id
     name: string; // object name is not unique
@@ -62,18 +66,26 @@ export class GameObject {
         return result;
     }
 
-    // set worldpostion
+    /**
+     * set worldpostion
+     */
     set worldPosition(v: Vector) {                        
         this.position.add(this.worldPosition.difference(v));
     }
 
-    // turn vector relative to this position to worldposition.
+    /**
+     * turn vector relative to this position to worldposition.
+     * @param v 
+     */
     relativePosToWorld(v: Vector): Vector {
         return this.worldPosition.add(v.scaleX(this.scale.x).scaleY(this.scale.y).rotate(this.rotation));
     }
 
 
-    // get child gameobject by id (not recursive)
+    /**
+     * get child gameobject by id (not recursive)
+     * @param id 
+     */
     getChildById(id: number): GameObject {
         for (const child of this.children) {
             if (id == child.id) {
@@ -82,7 +94,10 @@ export class GameObject {
         }
         return undefined;
     }
-    // get child gameobject by name (not recursive)
+    /**
+     * get child gameobject by name (not recursive)
+     * @param name 
+     */
     getChildrenByName(name: string): GameObject[] {
         var a = [];
 
@@ -94,7 +109,10 @@ export class GameObject {
 
         return a;
     }
-    // find child gameobject by identifier #{id} or {name} (is recursive).
+    /**
+     * find child gameobject by identifier #{id} or {name} (is recursive).
+     * @param identifier 
+     */
     find(identifier: string): any | any[] {
         var identifierType: string;
 
@@ -131,7 +149,10 @@ export class GameObject {
         }
     }
 
-    // add child gameobject
+    /**
+     * add child gameobject
+     * @param o 
+     */
     addChild(...o: GameObject[]) {
         for (const obj of o) {
             obj.parent = this;
@@ -141,7 +162,10 @@ export class GameObject {
     }
 
 
-    // get component by id (not recursive)
+    /**
+     * get component by id (not recursive)
+     * @param id 
+     */
     getComponentById(id: number) {
         for (const component of this.components) {
             if (id == component.id) {
@@ -149,7 +173,10 @@ export class GameObject {
             }
         }
     }
-    // get component by name (not recursive)
+    /**
+     * get component by name (not recursive)
+     * @param name 
+     */
     getComponentsByName(name: string): Component[] {
         var a = [];
 
@@ -161,15 +188,21 @@ export class GameObject {
 
         return a
     }
-    // get component by type (not recursive)
-    getComponentByType(type: string): Component {
+    /**
+     * get component by type (not recursive)
+     * @param type 
+     */
+    getComponentByType(type: string): any {
         for (const component of this.components) {
             if (type == component.type) {
                 return component;
             }
         }
     }
-    // find component by identifier #{id}, .{type} or {name} (is recursive)
+    /**
+     * find component by identifier #{id}, .{type} or {name} (is recursive)
+     * @param identifier 
+     */
     findComponent(identifier: string): any | any[] {
         var identifierType: string;
 
@@ -218,7 +251,10 @@ export class GameObject {
         return undefined;
     }
 
-    // add one or more components to this gameobject.
+    /**
+     * add one or more components to this gameobject.
+     * @param c 
+     */
     addComponent(...c: Component[]): this {
         for (const com of c) {
             com.parent = this;
@@ -228,7 +264,10 @@ export class GameObject {
         return this;
     }
 
-    // execute function for all children of this gameobject (is recursive)
+    /**
+     * execute function for all children of this gameobject (is recursive)
+     * @param f 
+     */
     foreachGameObject(f: Function) {
         function loop(o: GameObject) {
             if (o.children.length > 0) {
@@ -246,7 +285,13 @@ export class GameObject {
     }
 
 
-    // animate gameobject rotation.
+    // 
+    /**
+     * animate gameobject rotation.
+     * @param a 
+     * @param duration 
+     * @param callback 
+     */
     rotateTo(a: number, duration: number, callback: Function = function(){}) {
         anime({
             targets: this,
@@ -257,24 +302,47 @@ export class GameObject {
         });
     }
 
-    // trigger loopstart callbacks on components. called before update.
+    /**
+     * trigger loopstart callbacks on components. called before update.
+     */
     loopStart() {
         for (const component of this.components) {
-            component.loopStart();
+            if (component.enable) {
+                component.loopStart();
+            }
         }
     }
 
-    // trigger update callbacks on components. called every update
+    /**
+     * trigger update callbacks on components. called every update
+     */
     update() {
         for (const component of this.components) {
-            component.update();
+            if (component.enable) {
+                component.update();
+            }
         }
     }
 
-    // trigger draw callbacks on components. called every frame
+    /**
+     * trigger loopstart callbacks on components. called before update.
+     */
+    loopEnd() {
+        for (const component of this.components) {
+            if (component.enable) {
+                component.loopEnd();
+            }
+        }
+    }
+
+    /**
+     * trigger draw callbacks on components. called every frame
+     */
     drawUpdate() {
         for (const component of this.components) {
-            component.draw();
+            if (component.enable) {
+                component.draw();
+            }
         }
     }
 }

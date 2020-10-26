@@ -1,8 +1,11 @@
 import { GameObject } from "../game/gameobject";
 import { LinearFunction } from "../math/linearfunction";
 import { Vector } from "../math";
-import { renderer } from "../game";
+import { Game } from "../game";
 
+/**
+ * @category Shape
+ */
 export class Circle {
     radius: number;
     type: string = 'Circle';
@@ -23,7 +26,7 @@ export class Circle {
     }
 
     draw(pos: Vector, angle: number): void {
-        renderer.drawCircle({
+        Game.renderer.drawCircle({
             pos: pos,
             radius: this.radius,
             stroke: {

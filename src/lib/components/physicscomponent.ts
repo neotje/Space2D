@@ -1,9 +1,10 @@
 import { Component } from "../game/component";
 import { Vector } from "../math/vector";
-import { getDeltaTime, root, renderer } from "../game";
+import { Game } from "../game";
 import { gravityForce } from "../physics";
 import { roundTo } from "../math";
 import { Circle, Polygon } from "../shapes";
+import { DebugComponent } from "./debugcomponent";
 
 interface PhysicalProperties {
     mass: number;
@@ -16,14 +17,18 @@ interface Constrains {
     y: boolean;
 }
 
+/**
+ * @category Component
+ */
 export class PhysicsComponent extends Component {
 
     mass: number; // mass in kg
-    velocity: Vector; // velocity in m/s
+    velocity: Vector = new Vector(0, 0); // velocity in m/s
     angularVelocity: number = 1; // angular velocity in radians/s
-    a: Vector; // acceleration in m/s^2
+    a: Vector = new Vector(0, 0); // acceleration in m/s^2
     f: Vector = new Vector(0, 0); // force in newton
-    
+
+    enableGravity: boolean = true;
     // freeze movement in x or y axis
     constrains: Constrains = {
         x: false,
@@ -37,22 +42,24 @@ export class PhysicsComponent extends Component {
     private t: number = 0;
     private heaviestBody: PhysicsComponent;
 
-    constructor(name: string, props: PhysicalProperties, constrains?: Constrains) {
+    constructor(name: string, props: PhysicalProperties, constrains?: Constrains, enableGravity = true) {
         super(name, "PhysicsComponent");
 
         this.mass = props.mass;
         this.velocity = (props.velocity) ? props.velocity : new Vector(0, 0);
         this.collisionShape = (props.collisionShape) ? props.collisionShape : new Circle(10);
 
+        this.enableGravity = enableGravity
+
         this.constrains = (constrains) ? constrains : this.constrains;
     }
 
     applyImpulseForce(f: Vector, pos: Vector): void {
-        
+
     }
 
     collisionHandler() {
-        
+
     }
 
     loopStart() {
@@ -60,51 +67,49 @@ export class PhysicsComponent extends Component {
     }
 
     update() {
-        var dt = getDeltaTime();
-        
+        var dt = Game.getDeltaTime();
+
         // save some debug data
         if (this.parent.debug) {
             this.t += dt;
 
-            if (this.t > 0.01) {                                
+            if (this.t > 0.01) {
                 this.debugPoints.push(this.parent.worldPosition);
                 this.t = 0;
             }
         }
-        
+
         // get all physics components
-        var components: PhysicsComponent[] = root.findComponent('.' + this.type);
-        
+        var components: PhysicsComponent[] = Game.root.findComponent('.' + this.type);
+
         for (const component of components) {
             if (component.id != this.id) {
-                // calculate gravity force between components
-                var Fg = gravityForce(this.mass, component.mass, Math.abs(this.parent.worldPosition.distanceTo(component.parent.worldPosition)));
+                if (this.enableGravity) {
+                    // calculate gravity force between components
+                    var Fg = gravityForce(this.mass, component.mass, Math.abs(this.parent.worldPosition.distanceTo(component.parent.worldPosition)));
 
-                // just for debugging purposes
-                if (!this.heaviestBody) {
-                    this.heaviestBody = component;
+                    // just for debugging purposes
+                    if (!this.heaviestBody || component.mass > this.heaviestBody.mass) {
+                        this.heaviestBody = component;
+                    }
+
+                    // angle of the gravity force
+                    var angle = this.parent.worldPosition.lookAt(component.parent.worldPosition).angle;
+
+                    var FgV = new Vector(Fg, 0);
+                    FgV.angle = angle;
+
+                    // apply force
+                    if (Fg != NaN && Fg != Infinity) {
+                        this.f.add(FgV)
+                    }
                 }
-                if (component.mass > this.heaviestBody.mass) {
-                    this.heaviestBody = component;
-                }
-
-                // angle of the gravity force
-                var angle = this.parent.worldPosition.lookAt(component.parent.worldPosition).angle;
-
-                var FgV = new Vector(Fg, 0);
-                FgV.angle = angle;
-                
-                // apply force
-                if(Fg != NaN && Fg != Infinity){
-                    this.f.add(FgV)
-                }
-
-                console.log(this.parent.id, Fg);
             }
         }
-        
+    }
 
-        var dt = getDeltaTime();
+    loopEnd() {
+        var dt = Game.getDeltaTime();
 
         this.a = this.f.copy().divide(this.mass);
 
@@ -118,42 +123,33 @@ export class PhysicsComponent extends Component {
         }
 
         this.parent.worldPosition = this.parent.worldPosition.add(this.velocity.copy().scale(dt));
-        this.parent.rotation += this.angularVelocity * dt;        
+        this.parent.rotation += this.angularVelocity * dt;
     }
 
     draw() {
         //console.log(this.debugPoints);
+        var debug: DebugComponent = this.parent.getComponentByType("DebugComponent");
 
-        if (this.parent.debug) {
-            renderer.drawLine({
-                start: this.parent.worldPosition,
-                end: this.parent.worldPosition.add(this.velocity),
-                color: '#ff0000'
-            });
-    
-            renderer.drawLine({
-                start: this.parent.worldPosition,
-                end: this.parent.worldPosition.add(this.a.copy().scale(1)),
-                color: '#00ff00'
-            });
+        if (debug) {
+            debug.vector('v', this.velocity, '#ff0000')
+            debug.vector('a', this.a, '#00ff00')
 
-            renderer.drawText(this.parent.worldPosition, new Vector(0,45), `v: ${roundTo(this.velocity.magnitude, 3)}`);
-            renderer.drawText(this.parent.worldPosition, new Vector(0,45 + 1*14), `m: ${roundTo(this.mass, 3)}`);
-            renderer.drawText(this.parent.worldPosition, new Vector(0,45 + 2*14), `a: ${roundTo(this.a.magnitude, 3)}`);
-            //renderer.drawText(this.parent.worldPosition, new Vector(0,43), `a: ${this.a.magnitude}`);
-            renderer.drawText(this.parent.worldPosition, new Vector(0,45 + 4*14), `Fres: ${roundTo(this.f.magnitude, 3)}`);
+            debug.value('v', this.velocity.magnitude);
+            debug.value('a', this.a.magnitude);
+            debug.value('Fres', this.f.magnitude);
+            debug.value('mass', this.mass);
 
             if (this.debugPoints.length > 1) {
-                renderer.drawPointList(this.debugPoints);
+                Game.renderer.drawPointList(this.debugPoints);
             }
-    
+
             if (this.debugPoints.length > 250) {
                 this.debugPoints.shift();
             }
 
             if (this.heaviestBody) {
                 var r = this.parent.worldPosition.distanceTo(this.heaviestBody.parent.worldPosition);
-                renderer.drawText(this.parent.worldPosition, new Vector(0,29 + 4*14), `r: ${roundTo(r, 3)}`);
+                debug.value('r', r);
             }
 
             if (this.collisionShape) {

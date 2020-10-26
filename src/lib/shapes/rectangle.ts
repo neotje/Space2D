@@ -1,5 +1,8 @@
 import { Vector } from "../math/vector";
 
+/**
+ * @category Shape
+ */
 class Rectangle {
     size: Vector;
 
