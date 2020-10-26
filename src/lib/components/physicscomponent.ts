@@ -61,7 +61,7 @@ export class PhysicsComponent extends Component {
         
         for (const component of components) {
             if (component.id != this.id) {
-                // calculate gravity force
+                // calculate gravity force between components
                 var Fg = gravityForce(this.mass, component.mass, Math.abs(this.parent.worldPosition.distanceTo(component.parent.worldPosition)));
 
                 // just for debugging purposes
@@ -79,14 +79,11 @@ export class PhysicsComponent extends Component {
                 FgV.angle = angle;
                 
                 // apply force
-                this.f.add(FgV)
-
-                //ddconsole.log(this.parent.id, Fg);
-
-                // collision detection
-                if (this.collisionShape && component.collisionShape) {
-                    
+                if(Fg != NaN && Fg != Infinity){
+                    this.f.add(FgV)
                 }
+
+                console.log(this.parent.id, Fg);
             }
         }
         

@@ -45,7 +45,7 @@ root.addChild(
     new GameObject({ name: 'exoplanet 3', position: new Vector(0, -250), rotation: 0, debug: true }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 5.972e12,
-            velocity: new Vector(10, 50)
+            velocity: new Vector(0, 0)
         })
     )
 )

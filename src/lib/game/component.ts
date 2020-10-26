@@ -20,6 +20,8 @@ export class Component {
 
     loopStart(): void {}
 
+    loopEnd(): void {}
+
     update(): void {}
 
     draw(): void {}
