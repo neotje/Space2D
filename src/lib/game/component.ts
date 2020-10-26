@@ -32,6 +32,11 @@ export class Component {
     update(): void {}
 
     /**
+     * This function will run after the update of every gameobject
+     */
+    loopEnd(): void {}
+
+    /**
      * Draw update called every frame
      */
     draw(): void {}
