@@ -1,9 +1,13 @@
 import { Vector } from "../math/vector";
 import { LinearFunction } from "../math/linearfunction";
+import { renderer } from "../game";
 
 export class Polygon {
     points: Vector[];
     center: Vector = new Vector(0, 0);
+    angle: number = 0;
+
+    type: string = 'Polygon';
 
     constructor(points: Vector[]) {
         this.points = points;
@@ -12,6 +16,14 @@ export class Polygon {
     translateTo(c: Vector): this {
         this.center.subtract(c);
         return this;
+    }
+
+    get rotatedPoints(): Vector[] {
+        var points: Vector[] = []
+        for (const p of this.points) {
+            points.push(p.copy().rotateBy(this.angle));
+        } 
+        return points;
     }
 
     getLineIntersects(l: LinearFunction): Vector[] {
@@ -72,8 +84,20 @@ export class Polygon {
         return false;
     }
 
-    draw(pos: Vector): void {
-        
+    draw(pos: Vector, angle: number): void {
+        var points: Vector[] = []
+        for (const p of this.points) {
+            points.push(p.copy());
+        }        
+
+        renderer.drawPolygon({
+            pos: pos,
+            points: points,
+            angle: 0,
+            stroke: {
+                color: "#00f"
+            }
+        })
     }
 }
 

@@ -1,2 +1,2 @@
 export { Constants } from "./physics/constants";
-export { escapeVelocity, escapeVelocityVector, gravityForce } from "./physics/formulas";
+export { escapeVelocity, escapeVelocityVector, gravityForce, firstCosmicVelocity, firstCosmicVelocityVector } from "./physics/formulas";

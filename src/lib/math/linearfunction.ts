@@ -108,3 +108,10 @@ export class LinearFunction {
         return Math.atan((this.d - l.d) / (1 + (this.d * l.d)));
     }
 }
+
+export function distancePointToLine(l: LinearFunction, p: Vector) {
+    var l2: LinearFunction = new LinearFunction().setPerpendicularTo(l).setBfromPoint(p);
+    var s: Vector = l.crossesLineIn(l2);
+
+    return Math.abs(p.distanceTo(s));
+}

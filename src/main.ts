@@ -3,7 +3,7 @@ import { GameObject } from './lib/game';
 import { Vector } from './lib/math';
 import { CameraComponent } from './lib/components/cameracomponent';
 import { PhysicsComponent } from './lib/components/physicscomponent';
-import { escapeVelocityVector } from './lib/physics';
+import { firstCosmicVelocityVector } from './lib/physics';
 import { BasicMovementComponent } from './lib/components/basicmovementcomponent';
 import { LinearFunction as Line } from "./lib/math";
 import { Polygon } from "./lib/shapes";
@@ -26,20 +26,26 @@ root.addChild(
         new PhysicsComponent('physics', {
             mass: 1.989e15
         }, {
-            x: true,
-            y: true
+            x: false,
+            y: false
         })
     ),
     new GameObject({ name: 'planet 1', position: new Vector(100, 0), rotation: 0, debug: true }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 0.33e12,
-            velocity: escapeVelocityVector(1.989e15, new Vector(0, 0), new Vector(100, 0)).add(new Vector(0, 0))
+            velocity: firstCosmicVelocityVector(1.989e15, new Vector(0, 0), new Vector(100, 0)).add(new Vector(0, 0))
         })
     ),
     new GameObject({ name: 'planet 2', position: new Vector(-200, 0), rotation: 0, debug: true }).addComponent(
         new PhysicsComponent('obj2', {
             mass: 5.972e12,
-            velocity: escapeVelocityVector(1.989e15, new Vector(0, 0), new Vector(200, 0)).add(new Vector(0, 0))
+            velocity: firstCosmicVelocityVector(1.989e15, new Vector(0, 0), new Vector(200, 0)).add(new Vector(0, 0)),
+            collisionShape: new Polygon([
+                new Vector( 10, 10),
+                new Vector( 10,-10),
+                new Vector(-10,-10),
+                new Vector(-10, 10)
+            ])
         })
     ),
     new GameObject({ name: 'exoplanet 3', position: new Vector(0, -250), rotation: 0, debug: true }).addComponent(
@@ -51,6 +57,13 @@ root.addChild(
 )
 
 console.log(root);
+
+
+var v: Vector = new Vector(-0.5, 1);
+
+console.log(v);
+console.log(v.mirrorWith(new Vector(1, 0)));
+
 
 start();
 

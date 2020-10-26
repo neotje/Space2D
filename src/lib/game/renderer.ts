@@ -45,7 +45,9 @@ interface point {
 }
 
 interface polygon {
+    pos: Vector;
     points: Vector[];
+    angle?: number;
     fill?: fill;
     stroke?: stroke;
 }
@@ -123,6 +125,7 @@ export class Renderer {
                 this.drawPoint(object.worldPosition, object.color, 3);
 
                 this.drawText(object.worldPosition, new Vector(0, 15), `#${object.id} ${object.name}`);
+                this.drawText(object.worldPosition, new Vector(0, 15 + 14), `x:${object.worldPosition.x} y:${object.worldPosition.y}`);
             }
 
             object.drawUpdate();
@@ -138,7 +141,7 @@ export class Renderer {
                 this.update();
             }, 0);
         }
-        
+
     }
 
     randomColor(): string {
@@ -256,13 +259,18 @@ export class Renderer {
     }
 
     drawPolygon(polygon: polygon) {
+        var angle = (polygon.angle) ? polygon.angle : 0;
+        for (const p of polygon.points) {
+            p.rotateBy(angle);
+        }
+
         for (const camera of this.cameras) {
-            var first = camera.worldPosToCanvas(polygon.points[0]);
+            var first = camera.worldPosToCanvas(polygon.pos.copy().add(polygon.points[0]));
 
             this.ctx.beginPath();
             this.ctx.moveTo(first.x, first.y)
             for (const p of polygon.points) {
-                var cp = camera.worldPosToCanvas(p);
+                var cp = camera.worldPosToCanvas(polygon.pos.copy().add(p));
                 this.ctx.lineTo(cp.x, cp.y);
             }
             this.ctx.lineTo(first.x, first.y)

@@ -25,14 +25,5 @@ export class MeshComponent extends Component {
                 color: "#33cc33"
             }
         })
-
-        renderer.drawPolygon({
-            points: [
-                this.parent.relativePosToWorld(new Vector(-2, 0)),
-                this.parent.relativePosToWorld(new Vector(-3, 1)),
-                this.parent.relativePosToWorld(new Vector(-4, 0))
-            ],
-            fill: {}
-        })
     }
 }

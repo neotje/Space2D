@@ -17,20 +17,20 @@ interface GameObjectOptions {
 }
 
 export class GameObject {
-    readonly id: number;
-    name: string;
+    readonly id: number; // unique id
+    name: string; // object name is not unique
 
-    position: Vector;
-    rotation: number;
-    scale: Vector;
+    position: Vector; // relative position
+    rotation: number; // rotation
+    scale: Vector; // scale not implented well enough yet
 
-    color: string;
+    color: string; // transform color
 
-    debug: boolean;
+    debug: boolean; // display debug info of this gameobject and components
 
-    parent: GameObject;
-    children: GameObject[] = [];
-    components: Component[] = [];
+    parent: GameObject; // parent gameobject
+    children: GameObject[] = []; // children gameobject
+    components: Component[] = []; // components
 
     constructor(opt: GameObjectOptions) {
         this.id = lastID;
@@ -44,6 +44,7 @@ export class GameObject {
         this.debug = (opt.debug) ? opt.debug : false;
     }
 
+    // get worldposition
     get worldPosition(): Vector {
         var vectors: Vector[] = [];
         var object: GameObject = this;
@@ -61,15 +62,18 @@ export class GameObject {
         return result;
     }
 
+    // set worldpostion
     set worldPosition(v: Vector) {                        
         this.position.add(this.worldPosition.difference(v));
     }
 
+    // turn vector relative to this position to worldposition.
     relativePosToWorld(v: Vector): Vector {
         return this.worldPosition.add(v.scaleX(this.scale.x).scaleY(this.scale.y).rotate(this.rotation));
     }
 
 
+    // get child gameobject by id (not recursive)
     getChildById(id: number): GameObject {
         for (const child of this.children) {
             if (id == child.id) {
@@ -78,6 +82,7 @@ export class GameObject {
         }
         return undefined;
     }
+    // get child gameobject by name (not recursive)
     getChildrenByName(name: string): GameObject[] {
         var a = [];
 
@@ -89,6 +94,7 @@ export class GameObject {
 
         return a;
     }
+    // find child gameobject by identifier #{id} or {name} (is recursive).
     find(identifier: string): any | any[] {
         var identifierType: string;
 
@@ -125,6 +131,7 @@ export class GameObject {
         }
     }
 
+    // add child gameobject
     addChild(...o: GameObject[]) {
         for (const obj of o) {
             obj.parent = this;
@@ -134,6 +141,7 @@ export class GameObject {
     }
 
 
+    // get component by id (not recursive)
     getComponentById(id: number) {
         for (const component of this.components) {
             if (id == component.id) {
@@ -141,6 +149,7 @@ export class GameObject {
             }
         }
     }
+    // get component by name (not recursive)
     getComponentsByName(name: string): Component[] {
         var a = [];
 
@@ -152,6 +161,7 @@ export class GameObject {
 
         return a
     }
+    // get component by type (not recursive)
     getComponentByType(type: string): Component {
         for (const component of this.components) {
             if (type == component.type) {
@@ -159,6 +169,7 @@ export class GameObject {
             }
         }
     }
+    // find component by identifier #{id}, .{type} or {name} (is recursive)
     findComponent(identifier: string): any | any[] {
         var identifierType: string;
 
@@ -207,6 +218,7 @@ export class GameObject {
         return undefined;
     }
 
+    // add one or more components to this gameobject.
     addComponent(...c: Component[]): this {
         for (const com of c) {
             com.parent = this;
@@ -216,7 +228,7 @@ export class GameObject {
         return this;
     }
 
-
+    // execute function for all children of this gameobject (is recursive)
     foreachGameObject(f: Function) {
         function loop(o: GameObject) {
             if (o.children.length > 0) {
@@ -234,6 +246,7 @@ export class GameObject {
     }
 
 
+    // animate gameobject rotation.
     rotateTo(a: number, duration: number, callback: Function = function(){}) {
         anime({
             targets: this,
@@ -244,18 +257,21 @@ export class GameObject {
         });
     }
 
+    // trigger loopstart callbacks on components. called before update.
     loopStart() {
         for (const component of this.components) {
             component.loopStart();
         }
     }
 
+    // trigger update callbacks on components. called every update
     update() {
         for (const component of this.components) {
             component.update();
         }
     }
 
+    // trigger draw callbacks on components. called every frame
     drawUpdate() {
         for (const component of this.components) {
             component.draw();

@@ -5,6 +5,7 @@ import { renderer } from "../game";
 
 export class Circle {
     radius: number;
+    type: string = 'Circle';
 
     constructor(radius: number) {
         this.radius = radius;
@@ -21,12 +22,12 @@ export class Circle {
         return false;
     }
 
-    draw(pos: Vector): void {
+    draw(pos: Vector, angle: number): void {
         renderer.drawCircle({
             pos: pos,
             radius: this.radius,
             stroke: {
-                color: "#fff"
+                color: "#00f"
             }
         });
     }

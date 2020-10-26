@@ -42,6 +42,15 @@ export class Vector {
         if (this.x < 1.3e-16 && this.x > -1.3e-16) this.x = 0;
     }
 
+    mirror(): this {
+        this.angle = -this.angle;
+        return this;
+    }
+    mirrorWith(n: Vector): this {
+        this.angle = n.angle + (Math.PI - (this.angle - n.angle));
+        return this;
+    }
+
     equalTo(v: Vector): Boolean {
         return this.x == v.x && this.y == v.y;
     }
@@ -92,6 +101,10 @@ export class Vector {
 
     dotproduct(v: Vector): number {
         return this.x * v.x + this.y * v.y;
+    }
+
+    crossproduct(v: Vector): any {
+        
     }
 
     rotateBy(a: number): this {

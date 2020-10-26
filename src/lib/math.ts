@@ -1,4 +1,4 @@
-export { LinearFunction } from "./math/linearfunction";
+export { LinearFunction, distancePointToLine } from "./math/linearfunction";
 export { Vector } from "./math/vector";
 
 export function roundTo(n: number, d: number) {
