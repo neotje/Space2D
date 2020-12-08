@@ -1,15 +1,12 @@
-export { GameObject } from "./game/gameobject";
 export { Renderer } from "./game/renderer";
+export { GameObject } from "./game/gameobject";
 
-import { GameObject } from "./game";
-import { Vector } from "./math";
+import { Calc } from "./calc";
 import { Renderer } from "./game";
+import { GameObject } from "./game";
 
-/**
- * @namespace game
- */
 export namespace Game {
-    export var root = new GameObject({ name: "root", position: new Vector(0, 0), color: "#ff0000" });
+    export var root = new GameObject({ name: "root", position: new Calc.Vector(0, 0), color: "#ff0000" });
     export var renderer = new Renderer(document.querySelector('#game'), {
         imageSmoothing: true,
         drawStats: true,

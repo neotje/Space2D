@@ -1,11 +1,11 @@
 import { Component } from "../game/component";
-import { Vector } from "../math/vector";
 import anime from "../anime.es";
+import { Calc } from "../calc";
 
 interface ViewPort {
     width: number;
     height: number;
-    position: Vector;
+    position: Calc.Vector;
 }
 
 /**
@@ -18,7 +18,7 @@ export class CameraComponent extends Component {
     overflow: boolean = true;
     backgroundColor: string = "#000000"
 
-    private parentPos: Vector;
+    private parentPos: Calc.Vector;
 
     constructor(canvas: HTMLCanvasElement, name: string = "camera", viewport: ViewPort, color?: string) {
         super(name, "CameraComponent");
@@ -32,15 +32,15 @@ export class CameraComponent extends Component {
      * convert world position to viewport position.
      * @param v 
      */
-    worldPosToViewport(v: Vector): Vector {
-        return this.parentPos.difference(v).scale(this.zoom).add(new Vector(this.viewport.width / 2, this.viewport.height / 2));
+    worldPosToViewport(v: Calc.Vector): Calc.Vector {
+        return this.parentPos.difference(v).scale(this.zoom).add(new Calc.Vector(this.viewport.width / 2, this.viewport.height / 2));
     }
 
     /**
      * convert world position to canvas position.
      * @param v 
      */
-    worldPosToCanvas(v: Vector): Vector {
+    worldPosToCanvas(v: Calc.Vector): Calc.Vector {
         return this.viewport.position.copy().add(this.worldPosToViewport(v));
     }
 

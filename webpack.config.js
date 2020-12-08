@@ -4,7 +4,7 @@ module.exports = {
   devtool: 'inline-source-map',
   devServer: {
     contentBase: './dist',
-    host: 'localhost'
+    host: '192.168.111.31'
   },
   module: {
     rules: [

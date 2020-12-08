@@ -1,6 +1,5 @@
 import { GameObject } from "../game/gameobject";
-import { LinearFunction } from "../math/linearfunction";
-import { Vector } from "../math";
+import { Calc } from "../calc";
 import { Game } from "../game";
 
 /**
@@ -9,23 +8,24 @@ import { Game } from "../game";
 export class Circle {
     radius: number;
     type: string = 'Circle';
+    angle: number = 0;
 
     constructor(radius: number) {
         this.radius = radius;
     }
 
-    getLineIntersects(l: LinearFunction): Vector[] {
+    getLineIntersects(l: Calc.LinearFunction): Calc.Vector[] {
         return []
     }
 
-    isPointInside(p: Vector): boolean {
-        if (Math.abs(new Vector(0, 0).distanceTo(p)) <= this.radius) {
+    isPointInside(p: Calc.Vector): boolean {
+        if (Math.abs(new Calc.Vector(0, 0).distanceTo(p)) <= this.radius) {
             return true;
         }
         return false;
     }
 
-    draw(pos: Vector, angle: number): void {
+    draw(pos: Calc.Vector, angle: number): void {
         Game.renderer.drawCircle({
             pos: pos,
             radius: this.radius,

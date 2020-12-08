@@ -1,11 +1,11 @@
 import { Game } from "../game";
 import { Component } from "../game/component";
-import { roundTo } from "../math";
-import { Vector } from "../math/vector";
+import { Calc } from "../calc";
+import { PhysicsComponent } from "./physicscomponent";
 
 interface DebugVector {
     name: string;
-    v: Vector;
+    v: Calc.Vector;
     color: string;
 }
 
@@ -47,7 +47,7 @@ export class DebugComponent extends Component {
      * @param v 
      * @param color 
      */
-    vector(name: string, v: Vector, color?: string): void {
+    vector(name: string, v: Calc.Vector, color?: string): void {
         var i = this.hasVector(name);
         if (i == -1) {
             this.vectors.push({
@@ -107,17 +107,32 @@ export class DebugComponent extends Component {
         }
 
         var y: number = -(2 + this.values.length) * 7
+        var x: number = 15
+        var posx: number = 0
 
-        Game.renderer.drawText(this.parent.worldPosition, new Vector(15, y), `#${this.parent.id} ${this.parent.name}`);
-        Game.renderer.drawText(this.parent.worldPosition, new Vector(15, y + 14), `x:${roundTo(this.parent.worldPosition.x, 4)}`);
-        Game.renderer.drawText(this.parent.worldPosition, new Vector(15, y + 2 * 14), `y:${roundTo(this.parent.worldPosition.y, 4)}`);
+        var p: PhysicsComponent = this.parent.getComponentByType("PhysicsComponent")
+        if (p && p.collisionShape) {
+            posx = p.collisionShape.boundingBox.max.x
+        }
+
+        var parentPos: Calc.Vector = this.parent.worldPosition
+
+        parentPos.x += posx
+
+        Game.renderer.drawText(parentPos, new Calc.Vector(x, y), `#${this.parent.id} ${this.parent.name}`);
+        Game.renderer.drawText(parentPos, new Calc.Vector(x, y + 14), `x:${Calc.roundTo(this.parent.worldPosition.x, 4)}`);
+        Game.renderer.drawText(parentPos, new Calc.Vector(x, y + 2 * 14), `y:${Calc.roundTo(this.parent.worldPosition.y, 4)}`);
 
         for (let i = 0; i < this.values.length; i++) {
             var yOff: number = 15 + (i + 2) * 14
 
-            const dval = this.values[i];
+            const dval = this.values[i]
 
-            Game.renderer.drawText(this.parent.worldPosition, new Vector(15, y + yOff), `${dval.name}: ${roundTo(dval.val, 3)}`);
+            if (typeof(dval.val) == "number") {
+                dval.val = Calc.roundTo(dval.val, 10)
+            }
+
+            Game.renderer.drawText(parentPos, new Calc.Vector(x, y + yOff), `${dval.name}: ${dval.val}`)
         }
     }
 }

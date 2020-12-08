@@ -1,41 +1,76 @@
-import { Vector } from '../math/vector';
 import { Component } from './component';
 import anime from '../anime.es';
-import { DebugComponent } from '../components/debugcomponent';
+import { Calc } from '../calc';
 
 var lastID = 0;
 
 interface GameObjectOptions {
     name: string,
 
-    position: Vector;
+    position: Calc.Vector;
     rotation?: number;
-    scale?: Vector;
+    scale?: Calc.Vector;
 
     color?: string;
-
-    debug?: boolean;
 }
 
 /**
+ * GameObjects define the structure of the game's object tree.
+ * 
+ * A GameObject could have 1 or more GameObject as children.
+ * 
+ * And the {@link Component} on a GameObject define the behaviour of the GameObject.
+ * 
+ * Basic usage example {@link GameObject.constructor}:
+ * 
+ * ```ts
+ * new GameObject({
+ *    name: "name",
+ *    position: new Calc.Vector(0, 0)
+ *    // see GameObjectOptions
+ * }).addComponent(
+ *    new CamerComponent(...),
+ *    ...
+ * )
+ * ```
  * @category Game
  */
 export class GameObject {
-    readonly id: number; // unique id
-    name: string; // object name is not unique
+    /** unique object id. Incremented each time a new GameObject is constructed. */
+    readonly id: number
+    /** object name. not unique. can be used to group objects see {@link GameObject.find}. */
+    name: string
 
-    position: Vector; // relative position
-    rotation: number; // rotation
-    scale: Vector; // scale not implented well enough yet
+    /** Postion. relative to parent. */
+    position: Calc.Vector
+    /** Rotation in radians. */
+    rotation: number
+    /** Scale. **Warning: Not fully supported by every component. */
+    scale: Calc.Vector
 
-    color: string; // transform color
+    /** Color for debugging. */
+    color: string
 
-    debug: boolean; // display debug info of this gameobject and components
-
-    parent: GameObject; // parent gameobject
-    children: GameObject[] = []; // children gameobject
+    /** Parent GameObject. Get initilazed when added to game tree or other GameObject with {@link GameObject.addChild}. */
+    parent: GameObject;
+    /** Children GameObjects. To add a child GameObject use {@link GameObject.addChild}.*/
+    children: GameObject[] = []
+    /** GameObject's components. To add a component use {@link GameObject.addComponent} */
     components: Component[] = []; // components
 
+    /**
+     * Basic usage example:
+     * 
+     * ```ts
+     * new GameObject({
+     *    name: "name",
+     *    position: new Calc.Vector(0, 0)
+     *    // see GameObjectOptions
+     * })
+     * ```
+     * 
+     * @param opt Options containing basic gameobject data
+     */
     constructor(opt: GameObjectOptions) {
         this.id = lastID;
         lastID++;
@@ -43,16 +78,15 @@ export class GameObject {
         this.name = opt.name;
         this.position = opt.position;
         this.rotation = (opt.rotation) ? opt.rotation : 0;
-        this.scale = (opt.scale) ? opt.scale : new Vector(1, 1);
+        this.scale = (opt.scale) ? opt.scale : new Calc.Vector(1, 1);
         this.color = (opt.color) ? opt.color : "#fff";
-        this.debug = (opt.debug) ? opt.debug : false;
     }
 
     // get worldposition
-    get worldPosition(): Vector {
-        var vectors: Vector[] = [];
+    get worldPosition(): Calc.Vector {
+        var vectors: Calc.Vector[] = [];
         var object: GameObject = this;
-        var result: Vector = new Vector(0, 0);
+        var result: Calc.Vector = new Calc.Vector(0, 0);
 
         while (object.parent) {
             vectors.push(object.position);
@@ -69,7 +103,7 @@ export class GameObject {
     /**
      * set worldpostion
      */
-    set worldPosition(v: Vector) {                        
+    set worldPosition(v: Calc.Vector) {
         this.position.add(this.worldPosition.difference(v));
     }
 
@@ -77,7 +111,7 @@ export class GameObject {
      * turn vector relative to this position to worldposition.
      * @param v 
      */
-    relativePosToWorld(v: Vector): Vector {
+    relativePosToWorld(v: Calc.Vector): Calc.Vector {
         return this.worldPosition.add(v.scaleX(this.scale.x).scaleY(this.scale.y).rotate(this.rotation));
     }
 
@@ -110,17 +144,22 @@ export class GameObject {
         return a;
     }
     /**
-     * find child gameobject by identifier #{id} or {name} (is recursive).
-     * @param identifier 
+     * Find child gameobject by identifier #{id} or {name} (is recursive).
+     * 
+     * ```ts
+     * new GameObject(...).find('#1') // -> GameObject
+     * // or
+     * new GameObject(...).find('bullet') // -> GameObject[] 
+     * ```
+     * 
+     * @param identifier #{id} or {name}
      */
-    find(identifier: string): any | any[] {
-        var identifierType: string;
+    find(identifier: string): GameObject | GameObject[] {
+        var identifierType: string = "name";
 
         if (identifier[0] == "#") {
             identifierType = "id";
             identifier = identifier.replace('#', '')
-        } else {
-            identifierType = "name";
         }
 
         let a: GameObject[] = [];
@@ -144,9 +183,8 @@ export class GameObject {
 
         if (identifierType == "id") {
             return b;
-        } else {
-            return a;
         }
+        return a;
     }
 
     /**
@@ -155,6 +193,7 @@ export class GameObject {
      */
     addChild(...o: GameObject[]) {
         for (const obj of o) {
+            // set parent for each GameObject
             obj.parent = this;
         }
         this.children = this.children.concat(o);
@@ -292,7 +331,7 @@ export class GameObject {
      * @param duration 
      * @param callback 
      */
-    rotateTo(a: number, duration: number, callback: Function = function(){}) {
+    rotateTo(a: number, duration: number, callback: Function = function () { }) {
         anime({
             targets: this,
             rotation: a,

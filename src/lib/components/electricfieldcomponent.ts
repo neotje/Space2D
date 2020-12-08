@@ -1,7 +1,7 @@
+import { Calc } from "../calc";
 import { Game } from "../game";
 import { Component } from "../game/component";
-import { Vector } from "../math/vector";
-import { electricalForce } from "../physics/electricalfield";
+import { Physics } from "../physics";
 import { DebugComponent } from "./debugcomponent";
 import { PhysicsComponent } from "./physicscomponent";
 
@@ -32,17 +32,24 @@ export class ElectricFieldComponent extends Component {
 
         for (const component of components) {
             if (component.id != this.id) {
-                var Fel = electricalForce(this.q, component.q, Math.abs(this.parent.worldPosition.distanceTo(component.parent.worldPosition)))
-                var angle = this.parent.worldPosition.lookAt(component.parent.worldPosition).angle
-                var FelV = new Vector(Fel, 0)
+                var Fel = Physics.electricalForce(this.q, component.q, Math.abs(this.parent.worldPosition.distanceTo(component.parent.worldPosition)))
+                var angle = component.parent.worldPosition.difference(this.parent.worldPosition).angle
+                var FelV = new Calc.Vector(Fel, 0)
                 FelV.angle = angle
 
-                if (debug) {
-                    debug.vector("Fel", FelV, "#ff00ff")
-                    debug.value("Fel", Fel)
+                if (Fel != NaN && Fel != Infinity && component.physics) {
+                    if ( (this.q > 0 && component.q > 0) || (this.q < 0 && component.q < 0) ) {
+                        component.physics.f.subtract(FelV)
+                    } else {
+                        component.physics.f.add(FelV)
+                    }
                 }
 
-                this.physics.f.add(FelV)
+                if (debug) {
+                    debug.vector(component.id + " Fel", this.physics.f, "#ff00ff")
+                    debug.value("Fel", Fel)
+                    debug.value("q", this.q)
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
+import { Calc } from "../calc";
 import { CameraComponent } from "../components/cameracomponent";
 import { Game } from "../game";
-import { Vector } from "../math/vector";
 import { GameObject } from "./gameobject";
 
 interface RendererOptions {
@@ -11,15 +11,15 @@ interface RendererOptions {
 }
 
 interface line {
-    start: Vector;
-    end: Vector;
+    start: Calc.Vector;
+    end: Calc.Vector;
     color?: string;
     width?: number;
 }
 
 interface rectangle {
-    start: Vector;
-    end?: Vector;
+    start: Calc.Vector;
+    end?: Calc.Vector;
     width?: number;
     height?: number;
     fill?: fill;
@@ -27,26 +27,26 @@ interface rectangle {
 }
 
 interface circle {
-    pos: Vector;
+    pos: Calc.Vector;
     radius: number;
     fill?: fill;
     stroke?: stroke;
 }
 
 interface ellipse {
-    pos: Vector;
-    radius: Vector;
+    pos: Calc.Vector;
+    radius: Calc.Vector;
     fill?: fill;
     stroke?: stroke;
 }
 
 interface point {
-    pos: Vector;
+    pos: Calc.Vector;
 }
 
 interface polygon {
-    pos: Vector;
-    points: Vector[];
+    pos: Calc.Vector;
+    points: Calc.Vector[];
     angle?: number;
     fill?: fill;
     stroke?: stroke;
@@ -159,7 +159,7 @@ export class Renderer {
      * @param offset offset
      * @param text content
      */
-    drawText(pos: Vector, offset: Vector, text: string): void {
+    drawText(pos: Calc.Vector, offset: Calc.Vector, text: string): void {
         for (const camera of this.cameras) {
             var pos = camera.worldPosToCanvas(pos).add(offset);
             this.ctx.fillText(text, pos.x, pos.y);
@@ -172,7 +172,7 @@ export class Renderer {
      * @param color color
      * @param thickness thickness in px
      */
-    drawPoint(pos: Vector, color: string, thickness: number): void {
+    drawPoint(pos: Calc.Vector, color: string, thickness: number): void {
         for (const camera of this.cameras) {
             var cpos = camera.worldPosToCanvas(pos);
             this.ctx.fillStyle = color;
@@ -210,7 +210,7 @@ export class Renderer {
     drawRect(opt: rectangle) {
         for (const camera of this.cameras) {
             var start = camera.worldPosToCanvas(opt.start);
-            var end = (!opt.end) ? camera.worldPosToCanvas(opt.start.copy().add(new Vector(opt.width, opt.height))) : camera.worldPosToCanvas(opt.end);
+            var end = (!opt.end) ? camera.worldPosToCanvas(opt.start.copy().add(new Calc.Vector(opt.width, opt.height))) : camera.worldPosToCanvas(opt.end);
             var difference = start.difference(end);
 
             this.ctx.beginPath();
@@ -321,7 +321,7 @@ export class Renderer {
      * draw line. mostly used for path debugging.
      * @param points 
      */
-    drawPointList(points: Vector[]) {
+    drawPointList(points: Calc.Vector[]) {
         for (let i = 0; i < points.length; i++) {
             const p = points[i];
             const next = points[i + 1];
