@@ -282,9 +282,17 @@ export namespace Calc {
          * @param v 
          */
         add(v: Vector): this {
-            this.x += v.x;
-            this.y += v.y;
-            return this;
+            this.x += v.x
+            this.y += v.y
+            return this
+        }
+        addX(x: number): this {
+            this.x += x
+            return this
+        }
+        addY(y: number): this {
+            this.y += y
+            return this
         }
 
         /**
