@@ -42,6 +42,7 @@ export class PhysicsComponent extends Component {
     private debugPoints: Calc.Vector[] = []
     private t: number = 0
     private heaviestBody: PhysicsComponent
+    private impulseToApply: Calc.Vector = new Calc.Vector(0, 0)
 
     constructor(name: string, props: PhysicalProperties, constrains?: Constrains, enableGravity?: boolean) {
         super(name, "PhysicsComponent")
@@ -69,25 +70,40 @@ export class PhysicsComponent extends Component {
         return box
     }
 
+    get impulse(): Calc.Vector {
+        return this.velocity.copy().scale(this.mass)
+    }
+
 
     addTorque(t: number) {
         this.torque += t
     }
 
+    /**
+     * add force at specific position.
+     * @param f Force Vector.
+     * @param p Position to apply force on.
+     */
     addForceAtPos(f: Calc.Vector, p: Calc.Vector) {
         this.f.add(f)
         this.torque -= p.crossproduct(f)
+    }
+
+    /**
+     * apply impulse
+     * @param p Impulse Vector kg/(m/s)
+     */
+    addImpulse(p: Calc.Vector) {
+        this.impulseToApply.add(p)
     }
 
 
     collisionHandler() {
         // get all physics components
         var components: PhysicsComponent[] = Game.root.findComponent('.' + this.type)
+        var debug: DebugComponent = this.parent.getComponentByType("DebugComponent")
 
-        if (!this.collisionShape) {
-            return
-        }
-
+        // get boundingbox
         var box: Shape.BoundingBox = this.boundingBox
 
         for (const component of components) {
@@ -96,15 +112,9 @@ export class PhysicsComponent extends Component {
                     var relative: Calc.Vector = this.parent.worldPosition.add(p).difference(component.parent.worldPosition)
                     
                     if (component.collisionShape.isPointInside(relative)) {
-                        
-
-                        var v = this.velocity.copy().subtract(component.velocity).scale(this.mass / component.mass)
-
-                        var f = v.scale(component.mass).divide(Game.getDeltaTime())
-
-                        //console.log(this.parent.id + " adding force", f);
-                        component.addForceAtPos(f, relative)
-                        
+                        // calculate speed after a unresilient collision
+                        this.velocity = (this.impulse.add(component.impulse).divide(this.mass + component.mass))
+                        component.velocity = this.velocity
                         break
                     }
                 }
@@ -160,7 +170,6 @@ export class PhysicsComponent extends Component {
         }
 
         this.collisionHandler()
-
     }
 
     loopEnd() {
@@ -168,6 +177,9 @@ export class PhysicsComponent extends Component {
         var debug: DebugComponent = this.parent.getComponentByType("DebugComponent")
 
         var a: Calc.Vector = this.f.copy().divide(this.mass)
+
+        this.velocity.add(this.impulseToApply.copy().divide(this.mass))
+        this.impulseToApply = new Calc.Vector(0, 0)
 
         this.velocity.add(a.copy().scale(dt))
 
@@ -188,7 +200,9 @@ export class PhysicsComponent extends Component {
         if (debug) {
             debug.vector('v', this.velocity, '#ff0000')
             debug.vector('f', this.f, '#00ff00')
+            debug.vector('p', this.impulse, '#ffff00')
 
+            debug.value('mass', this.mass)
             debug.value('AngularVel', this.angularVelocity)
             debug.value('Fres', this.f.magnitude)
             debug.value('v', this.velocity.magnitude)
