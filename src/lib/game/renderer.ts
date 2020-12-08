@@ -61,6 +61,11 @@ interface stroke {
     width?: number;
 }
 
+interface text {
+    color?: string;
+    font?: string;
+}
+
 /**
 for (const camera of this.cameras) {
             
@@ -148,9 +153,10 @@ export class Renderer {
         var stats = Game.getStatistics();
         this.ctx.fillStyle = "#fff"
         this.ctx.fillText(`fps: ${Math.round(this.fps)} `, 10, 10);
-        this.ctx.fillText(`draw dt: ${this.dt}`, 10, 24);
-        this.ctx.fillText(`game dt: ${stats.deltaTime}`, 10, 38);
-        this.ctx.fillText(`speed: ${stats.speed}`, 10, 52);
+        this.ctx.fillText(`frame: ${this.frame}`, 10, 24)
+        this.ctx.fillText(`draw dt: ${this.dt}`, 10, 38);
+        this.ctx.fillText(`game dt: ${stats.deltaTime}`, 10, 52);
+        this.ctx.fillText(`speed: ${stats.speed}`, 10, 66);
     }
 
     /**
@@ -159,10 +165,12 @@ export class Renderer {
      * @param offset offset
      * @param text content
      */
-    drawText(pos: Calc.Vector, offset: Calc.Vector, text: string): void {
+    drawText(pos: Calc.Vector, offset: Calc.Vector, text: string, style?: text): void {
         for (const camera of this.cameras) {
-            var pos = camera.worldPosToCanvas(pos).add(offset);
-            this.ctx.fillText(text, pos.x, pos.y);
+            var pos = camera.worldPosToCanvas(pos).add(offset)
+            this.ctx.font = (style.font) ? style.font : "10px sans-serif"
+            this.ctx.fillStyle = (style.color) ? style.color : "#fff"
+            this.ctx.fillText(text, pos.x, pos.y)
         }
     }
 
