@@ -99,7 +99,7 @@ export namespace Game {
         }
 
         if (!stop) {
-            setTimeout(update, 1);
+            setTimeout(update, 1 /* 1000/60 */);
         }
         return;
     }

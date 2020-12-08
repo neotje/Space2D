@@ -25,15 +25,17 @@ Game.root.addChild(
         ),
         new BasicMovementComponent('controller', 80)
     ),
+    // id: 2
     new GameObject({ name: 'box 1', position: new Calc.Vector(0, 0), rotation: 0 }).addComponent(
         new PhysicsComponent('physics', {
-            mass: 2
+            mass: 3
         }, undefined, false),
         new DebugComponent('debug')
     ),
-    new GameObject({ name: 'box 1', position: new Calc.Vector(-70, 10), rotation: 0 }).addComponent(
+    // id: 3
+    new GameObject({ name: 'box 1', position: new Calc.Vector(-70, 0), rotation: 0 }).addComponent(
         new PhysicsComponent('physics', {
-            mass: 2,
+            mass: 1,
             velocity: new Calc.Vector(10, 0)
         }, undefined, false),
         new DebugComponent('debug')
