@@ -28,6 +28,7 @@ export class PhysicsComponent extends Component {
     
     f: Calc.Vector = new Calc.Vector(0, 0) // force in newton
     torque: number = 0
+    restitution: number = 1
 
     enableGravity: boolean = true
     // freeze movement in x or y axis
@@ -112,9 +113,20 @@ export class PhysicsComponent extends Component {
                     var relative: Calc.Vector = this.parent.worldPosition.add(p).difference(component.parent.worldPosition)
                     
                     if (component.collisionShape.isPointInside(relative)) {
+
                         // calculate speed after a unresilient collision
-                        this.velocity = (this.impulse.add(component.impulse).divide(this.mass + component.mass))
-                        component.velocity = this.velocity
+                        if (this.restitution == 0) {
+                            this.velocity = (this.impulse.add(component.impulse).divide(this.mass + component.mass))
+                            component.velocity = this.velocity
+                        } else {
+                            component.addImpulse(this.velocity.copy().subtract(component.velocity).scale(this.mass).scale(this.restitution))
+                        }
+
+                        var relativeVel: Calc.Vector = this.velocity.copy().subtract(component.velocity)
+
+                        // minimum restitution
+                        var e = Math.min(this.restitution, component.restitution)
+                        
                         break
                     }
                 }
@@ -215,7 +227,7 @@ export class PhysicsComponent extends Component {
 
         if (debug) {
             if (this.debugPoints.length > 1) {
-                Game.renderer.drawPointList(this.debugPoints)
+                //Game.renderer.drawPointList(this.debugPoints)
             }
 
             if (this.debugPoints.length > 250) {

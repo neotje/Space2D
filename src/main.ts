@@ -28,14 +28,15 @@ Game.root.addChild(
     // id: 2
     new GameObject({ name: 'box 1', position: new Calc.Vector(0, 0), rotation: 0 }).addComponent(
         new PhysicsComponent('physics', {
-            mass: 3
+            mass: 1,
+            velocity: new Calc.Vector(0, 0)
         }, undefined, false),
         new DebugComponent('debug')
     ),
     // id: 3
     new GameObject({ name: 'box 1', position: new Calc.Vector(-70, 0), rotation: 0 }).addComponent(
         new PhysicsComponent('physics', {
-            mass: 1,
+            mass: 2,
             velocity: new Calc.Vector(10, 0)
         }, undefined, false),
         new DebugComponent('debug')
@@ -84,34 +85,5 @@ var cam: CameraComponent = Game.root.findComponent('.CameraComponent')[0];
 cam.zoomTo(3);
 cam.showBorders = false;
 
-//var f = new Line(3, 2);
-//var g = new Line(-3, -4);
-//var h = new Line(1, 3);
-
-console.log(Calc.twoLineSectionIntersect(
-    new Calc.Vector(0, 0),
-    new Calc.Vector(-1, -1),
-    new Calc.Vector(1, -1),
-    new Calc.Vector(-1, 1)
-));
-
-var p1 = new Polygon([
-    new Calc.Vector(10, 10),
-    new Calc.Vector(10, -10),
-    new Calc.Vector(-10, -10),
-    new Calc.Vector(-10, 10)
-])
-
-p1.angle = 1
-
-var p2 = new Polygon([
-    new Calc.Vector(10, 10),
-    new Calc.Vector(10, -10),
-    new Calc.Vector(-10, -10),
-    new Calc.Vector(-10, 10)
-])
-
-p2.angle = 2
-
-console.log(p1.getInterectsWithPolygon(p2, new Calc.Vector(30, 30)));
+console.log(new Calc.Vector(1, 1).dotproduct(new Calc.Vector(1, -1)))
 

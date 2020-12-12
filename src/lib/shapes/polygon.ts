@@ -123,34 +123,29 @@ export class Polygon {
      * @param p 
      */
     isPointInside(p: Calc.Vector): boolean {
-        var allIntersects = this.getLineIntersects(new Calc.LinearFunction(1).setBfromPoint(p));
-        var intersects: Calc.Vector[] = [];
+        var start: number = performance.now()
+        var points: Calc.Vector[] = this.rotatedPoints
+        var collision: boolean = false
 
-        for (const i of allIntersects) {
-            if (i.x >= p.x) {
-                intersects.push(i);
+        for (let current = 0; current < points.length; current++) {
+            var next = (current == points.length - 1) ? 0 : current + 1
+            
+            var b: Calc.Vector = points[current]
+            var c: Calc.Vector = points[next]
+
+            if (
+                ((b.y >= p.y && c.y < p.y) || (b.y < p.y && c.y >= p.y)) &&
+                (p.x < (c.x-b.y)*(p.y-b.y) / (c.y-b.y) + b.y)
+            ) {
+                collision = !collision
             }
+        }
+
+        if (Game.renderer.options.drawStats) {
+            console.log("Point inside poly performance: " + (performance.now() - start))
         }
         
-
-        if (intersects.length == 0) {
-            return false;
-        }
-
-        if (intersects.length == 1) {
-            var inside = true;
-            for (const point of this.rotatedPoints) {
-                if (point.equalTo(intersects[0])) {
-                    inside = false;
-                }
-            }
-            return inside;
-        }
-
-        if (isOdd(intersects.length)) {
-            return true;
-        }
-        return false;
+        return collision
     }
 
 
