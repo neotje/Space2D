@@ -247,7 +247,35 @@ export namespace Calc {
             if (this.x < 1.3e-16 && this.x > -1.3e-16) this.x = 0;
         }
 
+        /**
+         * unit vector (direction vector)
+         */
+        get unit(): Vector {
+            return new Vector(
+                this.x / this.magnitude,
+                this.y / this.magnitude
+            )
+        }
 
+
+        get dot(): number {
+            return this.dotproduct(this)
+        }
+
+
+        /**
+         * Get average of vector array
+         * 
+         * ```typescript
+         * // create empty vector
+         * // return Vector{x: 3, y: 0.5}
+         * new Calc.Vector().average([
+         *    new Calc.Vector(2, 3),
+         *    new Calc.Vector(4, -2)
+         * ])
+         * ```
+         * @param l 
+         */
         average(l: Vector[]): this {
             for (const v of l) {
                 this.add(v)
@@ -256,6 +284,9 @@ export namespace Calc {
         }
 
 
+        /**
+         * mirror in x axis
+         */
         mirror(): this {
             this.angle = -this.angle;
             return this;
@@ -279,7 +310,7 @@ export namespace Calc {
 
         /**
          * vector addition.
-         * @param v 
+         * @param v
          */
         add(v: Vector): this {
             this.x += v.x
@@ -393,6 +424,14 @@ export namespace Calc {
             this.angle = this.difference(v).angle;
             return this;
         }
+
+
+        projectOn(p: Calc.Vector): this {
+            this.x *= p.unit.x
+            this.y *= p.unit.y
+            return this
+        }
+
 
         copy(): Vector {
             return new Vector(this.x, this.y);
