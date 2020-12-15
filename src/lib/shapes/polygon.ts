@@ -2,6 +2,13 @@ import { Game } from "../game";
 import { Calc } from "../calc";
 import { Shape } from "../shape";
 
+
+interface PolygonCollision {
+    penetration: number
+    normal: Calc.Vector
+}
+
+
 /**
  * @category Shape
  */
@@ -13,7 +20,7 @@ export class Polygon {
 
     constructor(points: Calc.Vector[]) {
         this.points = points
-        this.translate(this.centerOfMass.scale(-1))
+        //this.translate(this.centerOfMass.scale(-1))
     }
 
     get centerOfMass(): Calc.Vector {
@@ -54,6 +61,17 @@ export class Polygon {
             p.add(c)
         }
         return this
+    }
+
+
+    copy(): Polygon {
+        var points: Calc.Vector[] = []
+        for (const point of this.points) {
+            points.push(point.copy())
+        }
+        var p = new Polygon(points)
+        p.angle = this.angle
+        return p
     }
 
     
@@ -142,10 +160,123 @@ export class Polygon {
         }
 
         if (Game.renderer.options.drawStats) {
-            console.log("Point inside poly performance: " + (performance.now() - start))
+            //console.log("Point inside poly performance: " + (performance.now() - start))
         }
         
         return collision
+    }
+
+
+    getCollisionInfo(shape: Polygon, pos: Calc.Vector): PolygonCollision {
+        var points: Calc.Vector[] = this.rotatedPoints
+        var result: PolygonCollision
+
+        for (const p of points) {
+            if (shape.isPointInside(p.copy().subtract(pos))) {
+                var points2: Calc.Vector[] = shape.rotatedPoints
+
+                for (let current = 0; current < points2.length; current++) {
+                    var next = (current == points2.length - 1) ? 0 : current + 1
+                    var coll: PolygonCollision // loop collision results
+                    
+                    var b: Calc.Vector = points2[current].copy().add(pos)
+                    var c: Calc.Vector = points2[next].copy().add(pos)
+
+                    var l2 = b.distanceTo(c)
+                    if (l2 == 0) {
+                        coll = {
+                            penetration: b.distanceTo(p),
+                            normal: b.difference(p).unit
+                        }
+                    } else {
+                        var t = ((p.x - b.x) * (c.x - b.x) + (p.y - b.y) * (c.y - b.y)) / l2
+                        t = Math.max(0, Math.min(1, t))
+    
+                        var d = p.distanceTo(new Calc.Vector(
+                            b.x + t * (c.x - b.x),
+                            b.y + t * (c.y - b.y)
+                        ))
+                        var n: Calc.Vector = b.difference(c)
+                        n.angle = n.angle + Math.PI/2
+
+                        coll =  {
+                            penetration: d,
+                            normal: n.unit
+                        }
+                    }
+
+                    if (!result) {
+                        result = coll
+                    } else if (coll.penetration < result.penetration) {
+                        result = coll
+                    }
+                }
+            }
+        }
+
+        return result
+    }
+    
+
+    seperatingAxis(shape: Polygon, rpos: Calc.Vector) {
+        var axis: Calc.Vector = rpos.unit
+
+
+        // getting min and max for this polygon
+        var poly1: Calc.Vector[] = this.rotatedPoints
+
+        var min1, max1: number = poly1[0].dotproduct(axis)
+
+        for (const p1 of poly1) {
+            var currentProjection: number = p1.dotproduct(axis)
+
+            if (currentProjection > max1) {
+                max1 = currentProjection
+            }
+            if (currentProjection < min1) {
+                min1 = currentProjection                
+            }
+        }
+
+        
+        // getting min and max for second polygon
+        var poly2: Calc.Vector[] = shape.rotatedPoints
+
+        var min2, max2: number = poly2[0].add(rpos).dotproduct(axis)
+
+        for (const p2 of poly2) {
+            var currentProjection: number = p2.add(rpos).dotproduct(axis)
+
+            if (currentProjection > max2) {
+                max2 = currentProjection
+            }
+            if (currentProjection < min2) {
+                min2 = currentProjection                
+            }
+        }
+
+        var penetration: number
+        var gap: number = Math.max(min2 - max1, min1 - max2)
+
+        if (min2 < max1 && max1 < max2) {
+            penetration = max1 - min2
+        }
+        if (min1 < max2 && min2 < min1) {
+            penetration = max2 - min1
+        }
+
+        var result = {
+            axis,
+            min1,
+            max1,
+            min2,
+            max2,
+            gap,
+            penetration
+        }
+
+        //console.log(result);
+        return penetration
     }
 
 
