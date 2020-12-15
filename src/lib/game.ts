@@ -22,11 +22,13 @@ export namespace Game {
     var deltaTime: number;
     var fps: number;
     var speed: number = 1;
+    var updateCount: number = 0;
 
     interface Statistics {
         fps: number;
         deltaTime: number;
         speed: number;
+        updateCount: number;
     }
 
     export function setSpeed(s: number) {
@@ -72,9 +74,10 @@ export namespace Game {
 
     export function getStatistics(): Statistics {
         return {
-            fps: fps,
-            deltaTime: deltaTime,
-            speed: speed
+            fps,
+            deltaTime,
+            speed,
+            updateCount
         }
     }
 
@@ -97,6 +100,8 @@ export namespace Game {
                 object.loopEnd();
             });
         }
+
+        updateCount++
 
         if (!stop) {
             setTimeout(update, 1 /* 1000/60 */);
