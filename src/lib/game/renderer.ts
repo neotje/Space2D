@@ -75,7 +75,7 @@ for (const camera of this.cameras) {
 var startTime = 0;
 
 /**
- * @category Game
+ * @category Graphics
  */
 export class Renderer {
     canvas: HTMLCanvasElement;

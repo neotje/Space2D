@@ -34,7 +34,7 @@ Game.root.addChild(
         new DebugComponent('debug')
     ),
     // id: 3
-    new GameObject({ name: 'box 1', position: new Calc.Vector(-70, 0), rotation: 0 }).addComponent(
+    new GameObject({ name: 'box 1', position: new Calc.Vector(-70, 0), rotation: Math.PI/4 }).addComponent(
         new PhysicsComponent('physics', {
             mass: 2,
             velocity: new Calc.Vector(10, 0)
@@ -85,5 +85,25 @@ var cam: CameraComponent = Game.root.findComponent('.CameraComponent')[0];
 cam.zoomTo(3);
 cam.showBorders = false;
 
-console.log(new Calc.Vector(1, 1).dotproduct(new Calc.Vector(1, -1)))
+
+var poly1 = new Polygon([
+    new Calc.Vector(10, 10),
+    new Calc.Vector(10, -10),
+    new Calc.Vector(-10, -10),
+    new Calc.Vector(-10, 10)
+])
+
+var poly2 = new Polygon([
+    new Calc.Vector(10, 10),
+    new Calc.Vector(10, -10),
+    new Calc.Vector(-10, -10),
+    new Calc.Vector(-10, 10)
+])
+
+poly2.angle = Math.PI / 4
+
+console.log(poly1.seperatingAxis(poly2, new Calc.Vector(15, 0)))
+console.log(new Calc.Vector(1,1).unit.scale(0.1).magnitude);
+
+
 
