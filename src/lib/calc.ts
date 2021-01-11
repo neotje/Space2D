@@ -217,7 +217,7 @@ export namespace Calc {
         public y: number;
 
         /**
-         * Make new vector 2D with a X and Y value
+         * Make new vector 2D with a X and Y value.
          * @param x number
          * @param y number
          */
@@ -235,9 +235,15 @@ export namespace Calc {
             }
         }
 
+        /**
+         * get angle in radians.
+         */
         get angle(): number {
             return Math.atan2(this.y, this.x)
         }
+        /**
+         * set angle in radians.
+         */
         set angle(a: number) {
             var r = this.magnitude;
 
@@ -248,7 +254,7 @@ export namespace Calc {
         }
 
         /**
-         * unit vector (direction vector)
+         * unit vector (direction vector).
          */
         get unit(): Vector {
             return new Vector(
@@ -258,13 +264,24 @@ export namespace Calc {
         }
 
 
+        /**
+         * get dot product of this vector.
+         */
         get dot(): number {
             return this.dotproduct(this)
         }
 
 
+        get leftNormal(): Calc.Vector {
+            return new Calc.Vector(-this.y, this.x).unit
+        }
+        get rightNormal(): Calc.Vector {
+            return new Calc.Vector(this.y, -this.x).unit
+        }
+
+
         /**
-         * Get average of vector array
+         * Get average of vector array.
          * 
          * ```typescript
          * // create empty vector
@@ -285,7 +302,7 @@ export namespace Calc {
 
 
         /**
-         * mirror in x axis
+         * mirror in x axis.
          */
         mirror(): this {
             this.angle = -this.angle;
@@ -327,7 +344,7 @@ export namespace Calc {
         }
 
         /**
-         * vector substraction
+         * vector substraction.
          * @param v 
          */
         subtract(v: Vector): this {
@@ -345,7 +362,7 @@ export namespace Calc {
         }
 
         /**
-         * vector scaling
+         * vector scaling.
          * @param s 
          */
         scale(s: number): this {
@@ -363,6 +380,10 @@ export namespace Calc {
             return this;
         }
 
+        /**
+         * divide x and y by s.
+         * @param s 
+         */
         divide(s: number): this {
             if (s > 0) {
                 this.x = this.x / s;
@@ -380,17 +401,25 @@ export namespace Calc {
             return v1.magnitude;
         }
 
+        /**
+         * the dot product of this vector and vector v.
+         * @param v 
+         */
         dotproduct(v: Vector): number {
             return (this.x * v.x) + (this.y * v.y)
         }
 
+        /**
+         * the cross product of this vector and vector v.
+         * @param v 
+         */
         crossproduct(v: Vector): number {
             return Math.abs((this.x * v.y) - (this.y * v.x))
         }
 
         /**
-         * rotate this vector angle by a
-         * @param a angle in radians
+         * rotate this vector angle by a.
+         * @param a angle in radians.
          */
         rotateBy(a: number): this {
             this.angle = this.angle + a;
@@ -398,7 +427,7 @@ export namespace Calc {
         }
 
         /**
-         * animated {@link Vector.rotateBy}
+         * animated version of {@link Vector.rotateBy}.
          * @param a 
          * @param duration 
          */
@@ -417,7 +446,7 @@ export namespace Calc {
         }
 
         /**
-         * rotate this vector to point at the other vector
+         * rotate this vector to point at the other vector.
          * @param v 
          */
         lookAt(v: Vector): this {
@@ -426,6 +455,10 @@ export namespace Calc {
         }
 
 
+        /**
+         * project this vector along vector p.
+         * @param p 
+         */
         projectOn(p: Calc.Vector): this {
             this.x *= p.unit.x
             this.y *= p.unit.y
@@ -433,6 +466,9 @@ export namespace Calc {
         }
 
 
+        /**
+         * copy this vector.
+         */
         copy(): Vector {
             return new Vector(this.x, this.y);
         }

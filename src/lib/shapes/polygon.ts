@@ -167,6 +167,12 @@ export class Polygon {
     }
 
 
+    /**
+     * Get collision info containing penetration depth and face normal.
+     * DO NOT USE BECAUSE ZERO OPTIMIZATION!!!
+     * @param shape second polygon.
+     * @param pos second polygon position relative to this polygon.
+     */
     getCollisionInfo(shape: Polygon, pos: Calc.Vector): PolygonCollision {
         var points: Calc.Vector[] = this.rotatedPoints
         var result: PolygonCollision
@@ -218,6 +224,11 @@ export class Polygon {
     }
     
 
+    /**
+     * Get penetration depth using the seperating axis theorem.
+     * @param shape other polygon.
+     * @param rpos position of second polygon relative to this polygon.
+     */
     seperatingAxis(shape: Polygon, rpos: Calc.Vector) {
         var axis: Calc.Vector = rpos.unit
 

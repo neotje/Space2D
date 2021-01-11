@@ -43,7 +43,7 @@ export class DebugComponent extends Component {
     }
 
     /**
-     * update/add vector to draw
+     * update/add vector to draw.
      * @param name Vector name 
      * @param v 
      * @param color 
@@ -62,7 +62,7 @@ export class DebugComponent extends Component {
     }
 
     /**
-     * check if debbuging component has value
+     * check if debbuging component has value.
      * @param name 
      */
     hasValue(name: string): number {
@@ -76,7 +76,7 @@ export class DebugComponent extends Component {
     }
 
     /**
-     * add/update value to show
+     * add/update value to show.
      * @param name 
      * @param val 
      * @param color 

@@ -75,7 +75,10 @@ export class PhysicsComponent extends Component {
         return this.velocity.copy().scale(this.mass)
     }
 
-
+    /**
+     * add torque
+     * @param t 
+     */
     addTorque(t: number) {
         this.torque += t
     }
