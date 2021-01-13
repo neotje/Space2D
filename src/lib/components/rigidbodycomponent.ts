@@ -58,6 +58,9 @@ export class RigidBodyComponent extends Component {
                 // get SAT results
                 var SAT = this.shape.seperatingAxis(component.shape, cRelativePos)
 
+                console.debug(this.id, SAT.penetration);
+                
+
                 if(SAT.penetration) {
                     console.debug(Game.getStatistics().updateCount, SAT)
 

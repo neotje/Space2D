@@ -109,93 +109,14 @@ export class PhysicsComponent extends Component {
     }
 
     onCollision(info: CollisionInfo) {
-        // account for collision depth
-        this.parent.worldPosition = this.parent.worldPosition.subtract(info.normal.scale(info.penetration / 2))
-
-        var pComponent: PhysicsComponent = info.object.getComponentByType(this.type)
-
-        console.log("collision");
-        
+        var pComponent: PhysicsComponent = info.object.getComponentByType(this.type)        
 
         if (pComponent && info.penetration) {
-            this.parent.worldPosition = this.parent.worldPosition.subtract(info.normal.scale(info.penetration / 2))
+            // account for collision depth
+            //this.parent.worldPosition = this.parent.worldPosition.subtract(info.normal.scale(info.penetration / 1.5))
 
-        }
-    }
-
-    collisionHandler() {
-        // get all physics components
-        var components: PhysicsComponent[] = Game.root.findComponent('.' + this.type)
-        var debug: DebugComponent = this.parent.getComponentByType("DebugComponent")
-
-        // get boundingbox
-        var box: Shape.BoundingBox = this.boundingBox
-
-        for (const component of components) {
-            // possible collision if inside bounding box
-            if (component.id != this.id && component.collisionShape && Shape.boundingBoxOverlap(box, component.boundingBox)) {
-                var cRelativePos: Calc.Vector = this.parent.worldPosition.difference(component.parent.worldPosition) // other object relative position to this object
-                var SAT = this.collisionShape.seperatingAxis(component.collisionShape, cRelativePos)
-
-                if (SAT.penetration) {
-                    console.debug(Game.getStatistics().updateCount, SAT);
-                    
-                    // account for collision depth
-                    this.parent.worldPosition = this.parent.worldPosition.subtract(cRelativePos.unit.scale(SAT.penetration/2))
-                    component.parent.worldPosition = component.parent.worldPosition.add(cRelativePos.unit.scale(SAT.penetration/2))
-
-                    // calculate speed after a unresilient collision
-                    if (this.restitution == 0) {
-                        this.velocity = (this.impulse.add(component.impulse).divide(this.mass + component.mass))
-                        component.velocity = this.velocity
-                    } else {
-                        component.addImpulse(this.velocity.copy().subtract(component.velocity).scale(this.mass).scale(this.restitution))
-                        this.addImpulse(component.velocity.copy().subtract(this.velocity).scale(component.mass).scale(this.restitution))
-                    }
-
-                    var relativeVel: Calc.Vector = this.velocity.copy().subtract(component.velocity)
-
-                    // minimum restitution
-                    var e = Math.min(this.restitution, component.restitution)
-                }
-
-
-                /* for (const p of this.collisionShape.rotatedPoints) {
-                    var relative: Calc.Vector = this.parent.worldPosition.add(p).difference(component.parent.worldPosition)
-                    
-                    if (component.collisionShape.isPointInside(relative)) {
-                        // get collision info
-                        var info = this.collisionShape
-                        .copy()
-                        .getCollisionInfo(
-                            component.collisionShape
-                            .copy(),
-                            this.parent.worldPosition.difference(component.parent.worldPosition)
-                        )
-                        console.log(this.id, info);
-                        
-                        // account for penetration depth
-                        if (info) {
-                            this.parent.worldPosition = this.parent.worldPosition.add(info.normal.copy().scale(2 * info.penetration))
-                        }
-                        
-                        // calculate speed after a unresilient collision
-                        if (this.restitution == 0) {
-                            this.velocity = (this.impulse.add(component.impulse).divide(this.mass + component.mass))
-                            component.velocity = this.velocity
-                        } else {
-                            component.addImpulse(this.velocity.copy().subtract(component.velocity).scale(this.mass).scale(this.restitution))
-                        }
-
-                        var relativeVel: Calc.Vector = this.velocity.copy().subtract(component.velocity)
-
-                        // minimum restitution
-                        var e = Math.min(this.restitution, component.restitution)
-                        
-                        break
-                    }
-                } */
-            }
+            // calculate new speeds
+            this.velocity = this.impulse.add(pComponent.impulse).divide(this.mass + pComponent.mass)
         }
     }
 

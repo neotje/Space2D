@@ -103,17 +103,18 @@ export class DebugComponent extends Component {
         // draw object position point
         Game.renderer.drawPoint(this.parent.worldPosition, "#fff", 3)
 
-        for (const dv of this.vectors) {
-            Game.renderer.drawLine({
-                start: this.parent.worldPosition,
-                end: this.parent.worldPosition.add(dv.v),
-                color: dv.color
-            });
-            Game.renderer.drawText(this.parent.worldPosition.add(dv.v), new Calc.Vector(0, -5), dv.name, {
-                font: font,
-                color: dv.color
-            })
-        }
+        // draw vectors
+        // for (const dv of this.vectors) {
+        //     Game.renderer.drawLine({
+        //         start: this.parent.worldPosition,
+        //         end: this.parent.worldPosition.add(dv.v),
+        //         color: dv.color
+        //     });
+        //     Game.renderer.drawText(this.parent.worldPosition.add(dv.v), new Calc.Vector(0, -5), dv.name, {
+        //         font: font,
+        //         color: dv.color
+        //     })
+        // }
 
         // text position variable
         var textOffset = new Calc.Vector(10, 1.5 * -(3 + this.values.length) * this.fontSize)

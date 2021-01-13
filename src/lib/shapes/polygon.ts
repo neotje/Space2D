@@ -8,6 +8,11 @@ interface PolygonCollision {
     normal: Calc.Vector
 }
 
+interface PolygonMinMax {
+    max: number;
+    min: number;
+}
+
 
 /**
  * @category Shape
@@ -50,6 +55,20 @@ export class Polygon {
         }
         
         return box
+    }
+
+    get normals(): Calc.Vector[] {
+        var result: Calc.Vector[] = []
+        var points: Calc.Vector[] = this.rotatedPoints
+
+        for (let i = 0; i < points.length; i++) {
+            var first = points[i]
+            var second = points[(i == points.length - 1)? 0 : i + 1]
+            
+            result.push(first.difference(second).leftNormal)
+        }
+
+        return result
     }
 
     /**
@@ -106,6 +125,12 @@ export class Polygon {
         return intersects;
     }
 
+
+    /**
+     * obsolete 
+     * @param poly 
+     * @param pos 
+     */
     getInterectsWithPolygon(poly: Polygon, pos: Calc.Vector): Calc.Vector[] {
         var a: Calc.Vector = this.rotatedPoints[this.rotatedPoints.length - 1]
         var b: Calc.Vector
@@ -170,6 +195,7 @@ export class Polygon {
     /**
      * Get collision info containing penetration depth and face normal.
      * DO NOT USE BECAUSE ZERO OPTIMIZATION!!!
+     * obsolete
      * @param shape second polygon.
      * @param pos second polygon position relative to this polygon.
      */
@@ -230,58 +256,116 @@ export class Polygon {
      * @param rpos position of second polygon relative to this polygon.
      */
     seperatingAxis(shape: Polygon, rpos: Calc.Vector): PolygonCollision {
-        var axis: Calc.Vector = rpos.unit
+        // polygon normals
+        var poly1normals: Calc.Vector[] = this.normals
+        var poly2normals: Calc.Vector[] = shape.normals
+
+        var isSeparated = false
 
 
-        // getting min and max for this polygon
-        var poly1: Calc.Vector[] = this.rotatedPoints
+        // first poly
+        for (const n of poly1normals) {
+            var r1 = this.getMinMax(n)
+            var r2 = shape.getMinMax(n, rpos)
 
-        var min1, max1: number = poly1[0].dotproduct(axis)
-
-        for (const p1 of poly1) {
-            var currentProjection: number = p1.dotproduct(axis)
-
-            if (currentProjection > max1) {
-                max1 = currentProjection
-            }
-            if (currentProjection < min1) {
-                min1 = currentProjection                
-            }
+            isSeparated = r1.max < r2.min || r2.max < r1.min
+            if (isSeparated) break;
         }
 
-        
-        // getting min and max for second polygon
-        var poly2: Calc.Vector[] = shape.rotatedPoints
-
-        var min2, max2: number = poly2[0].add(rpos).dotproduct(axis)
-
-        for (const p2 of poly2) {
-            var currentProjection: number = p2.add(rpos).dotproduct(axis)
-
-            if (currentProjection > max2) {
-                max2 = currentProjection
-            }
-            if (currentProjection < min2) {
-                min2 = currentProjection                
+        if (!isSeparated) {
+            for (const n of poly2normals) {
+                var r1 = this.getMinMax(n)
+                var r2 = shape.getMinMax(n, rpos)                
+    
+                isSeparated = r1.max < r2.min || r2.max < r1.min
+                if (isSeparated) break;
             }
         }
 
-        var penetration: number
-        var gap: number = Math.max(min2 - max1, min1 - max2)
-
-        if (min2 < max1 && max1 < max2) {
-            penetration = max1 - min2
+        if (isSeparated) {
+            return {
+                penetration: undefined,
+                normal: rpos.unit
+            }
         }
-        if (min1 < max2 && min2 < min1) {
-            penetration = max2 - min1
-        }
-
-        
-
-        console.log(penetration);
         return {
-            penetration: penetration,
-            normal: axis
+            penetration: 0.00000001,
+            normal: rpos.unit
+        }
+
+
+
+        // // getting min and max for this polygon
+        // var min1: number = poly1[0].copy().dotproduct(axis)
+        // var max1: number = min1
+
+        // for (const p1 of poly1) {
+        //     var currentProjection: number = p1.dotproduct(axis)
+
+        //     if (currentProjection > max1) {
+        //         max1 = currentProjection
+        //     }
+        //     if (currentProjection < min1) {
+        //         min1 = currentProjection                
+        //     }
+        // }
+
+        
+        // // getting min and max for second polygon
+        // var min2: number = poly2[0].copy().add(rpos).dotproduct(axis)
+        // var max2: number = min2
+
+        // for (const p2 of poly2) {
+        //     var currentProjection: number = p2.add(rpos).dotproduct(axis)
+
+        //     if (currentProjection > max2) {
+        //         max2 = currentProjection
+        //     }
+        //     if (currentProjection < min2) {
+        //         min2 = currentProjection                
+        //     }
+        // }
+
+        // var penetration: number
+        // var gap: number = Math.max(min2 - max1, min1 - max2)
+
+        // if (min2 < max1 && max1 < max2) {
+        //     penetration = max1 - min2
+        // }
+        // if (min1 < max2 && min2 < min1) {
+        //     penetration = max2 - min1
+        // }
+
+        
+        // console.log({
+        //     min1,
+        //     max1,
+        //     min2,
+        //     max2,
+        //     gap
+        // });
+    }
+
+
+    getMinMax(axis: Calc.Vector, pos: Calc.Vector = new Calc.Vector(0, 0)): PolygonMinMax {
+        var poly: Calc.Vector[] = this.rotatedPoints
+        var min: number = poly[0].copy().add(pos).dotproduct(axis)
+        var max: number = min
+
+        for (const p1 of poly) {
+            var currentProjection: number = p1.add(pos).dotproduct(axis)
+
+            if (currentProjection > max) {
+                max = currentProjection
+            }
+            if (currentProjection < min) {
+                min = currentProjection                
+            }
+        }
+
+        return {
+            max,
+            min
         }
     }
 
