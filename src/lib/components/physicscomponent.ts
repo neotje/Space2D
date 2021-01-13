@@ -5,6 +5,7 @@ import { Calc } from "../calc"
 import { Polygon } from "../shapes/polygon"
 import { DebugComponent } from "./debugcomponent"
 import { Shape } from "../shape"
+import { GameObject } from "../game/gameobject"
 
 interface PhysicalProperties {
     mass: number
@@ -15,6 +16,12 @@ interface PhysicalProperties {
 interface Constrains {
     x: boolean
     y: boolean
+}
+
+interface CollisionInfo {
+    object: GameObject;
+    penetration: number;
+    normal: Calc.Vector;
 }
 
 /**
@@ -101,6 +108,20 @@ export class PhysicsComponent extends Component {
         this.impulseToApply.add(p)
     }
 
+    onCollision(info: CollisionInfo) {
+        // account for collision depth
+        this.parent.worldPosition = this.parent.worldPosition.subtract(info.normal.scale(info.penetration / 2))
+
+        var pComponent: PhysicsComponent = info.object.getComponentByType(this.type)
+
+        console.log("collision");
+        
+
+        if (pComponent && info.penetration) {
+            this.parent.worldPosition = this.parent.worldPosition.subtract(info.normal.scale(info.penetration / 2))
+
+        }
+    }
 
     collisionHandler() {
         // get all physics components
@@ -114,14 +135,14 @@ export class PhysicsComponent extends Component {
             // possible collision if inside bounding box
             if (component.id != this.id && component.collisionShape && Shape.boundingBoxOverlap(box, component.boundingBox)) {
                 var cRelativePos: Calc.Vector = this.parent.worldPosition.difference(component.parent.worldPosition) // other object relative position to this object
-                var SAT: number = this.collisionShape.seperatingAxis(component.collisionShape, cRelativePos)
+                var SAT = this.collisionShape.seperatingAxis(component.collisionShape, cRelativePos)
 
-                if (SAT) {
-                    console.log(Game.getStatistics().updateCount, SAT);
+                if (SAT.penetration) {
+                    console.debug(Game.getStatistics().updateCount, SAT);
                     
                     // account for collision depth
-                    this.parent.worldPosition = this.parent.worldPosition.subtract(cRelativePos.unit.scale(SAT/2))
-                    component.parent.worldPosition = component.parent.worldPosition.add(cRelativePos.unit.scale(SAT/2))
+                    this.parent.worldPosition = this.parent.worldPosition.subtract(cRelativePos.unit.scale(SAT.penetration/2))
+                    component.parent.worldPosition = component.parent.worldPosition.add(cRelativePos.unit.scale(SAT.penetration/2))
 
                     // calculate speed after a unresilient collision
                     if (this.restitution == 0) {
@@ -225,7 +246,7 @@ export class PhysicsComponent extends Component {
             }
         }
 
-        this.collisionHandler()
+        //this.collisionHandler()
     }
 
     loopEnd() {

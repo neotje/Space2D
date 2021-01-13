@@ -10,6 +10,7 @@ import { ElectricFieldComponent } from './lib/components/electricfieldcomponent'
 import { Physics } from './lib/physics';
 import { Shape } from './lib/shape';
 import { Vector } from '../docs/assets/js/main';
+import { RigidBodyComponent } from './lib/components/rigidbodycomponent';
 
 
 Game.root.addChild(
@@ -27,6 +28,7 @@ Game.root.addChild(
     ),
     // id: 2
     new GameObject({ name: 'box 1', position: new Calc.Vector(0, 0), rotation: 0 }).addComponent(
+        new RigidBodyComponent('body', {}),
         new PhysicsComponent('physics', {
             mass: 1,
             velocity: new Calc.Vector(0, 0)
@@ -35,6 +37,7 @@ Game.root.addChild(
     ),
     // id: 3
     new GameObject({ name: 'box 1', position: new Calc.Vector(-70, 0), rotation: Math.PI/4 }).addComponent(
+        new RigidBodyComponent('body', {}),
         new PhysicsComponent('physics', {
             mass: 2,
             velocity: new Calc.Vector(10, 0)
@@ -71,6 +74,7 @@ Game.root.addChild(
 )
 
 console.log(Game.root);
+console.log(Game.root.findComponent('.RigidBodyComponent'));
 
 
 var v = Shape.genRegularPolygon(20, 10)

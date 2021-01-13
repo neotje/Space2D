@@ -1,6 +1,8 @@
+import { Calc } from "../calc";
 import { GameObject } from "./gameobject";
 
 var lastID = 0;
+
 
 /**
  * @category Component
@@ -44,4 +46,10 @@ export class Component {
      * Draw update called every frame
      */
     draw(): void {}
+
+    /**
+     * Called when rigidbodycomponent detected a collision.
+     * @param info 
+     */
+    onCollision(info: any): void {}
 }

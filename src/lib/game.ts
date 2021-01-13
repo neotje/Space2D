@@ -68,6 +68,9 @@ export namespace Game {
         renderer.update();
     }
 
+    /**
+     * get deltatime of game update loop.
+     */
     export function getDeltaTime(): number {
         return deltaTime * speed;
     }

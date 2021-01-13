@@ -229,7 +229,7 @@ export class Polygon {
      * @param shape other polygon.
      * @param rpos position of second polygon relative to this polygon.
      */
-    seperatingAxis(shape: Polygon, rpos: Calc.Vector) {
+    seperatingAxis(shape: Polygon, rpos: Calc.Vector): PolygonCollision {
         var axis: Calc.Vector = rpos.unit
 
 
@@ -276,18 +276,13 @@ export class Polygon {
             penetration = max2 - min1
         }
 
-        var result = {
-            axis,
-            min1,
-            max1,
-            min2,
-            max2,
-            gap,
-            penetration
-        }
+        
 
-        //console.log(result);
-        return penetration
+        console.log(penetration);
+        return {
+            penetration: penetration,
+            normal: axis
+        }
     }
 
 
