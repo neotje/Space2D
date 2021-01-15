@@ -191,185 +191,6 @@ export class Polygon {
         return collision
     }
 
-
-    /**
-     * Get collision info containing penetration depth and face normal.
-     * DO NOT USE BECAUSE ZERO OPTIMIZATION!!!
-     * obsolete
-     * @param shape second polygon.
-     * @param pos second polygon position relative to this polygon.
-     */
-    getCollisionInfo(shape: Polygon, pos: Calc.Vector): PolygonCollision {
-        var points: Calc.Vector[] = this.rotatedPoints
-        var result: PolygonCollision
-
-        for (const p of points) {
-            if (shape.isPointInside(p.copy().subtract(pos))) {
-                var points2: Calc.Vector[] = shape.rotatedPoints
-
-                for (let current = 0; current < points2.length; current++) {
-                    var next = (current == points2.length - 1) ? 0 : current + 1
-                    var coll: PolygonCollision // loop collision results
-                    
-                    var b: Calc.Vector = points2[current].copy().add(pos)
-                    var c: Calc.Vector = points2[next].copy().add(pos)
-
-                    var l2 = b.distanceTo(c)
-                    if (l2 == 0) {
-                        coll = {
-                            penetration: b.distanceTo(p),
-                            normal: b.difference(p).unit
-                        }
-                    } else {
-                        var t = ((p.x - b.x) * (c.x - b.x) + (p.y - b.y) * (c.y - b.y)) / l2
-                        t = Math.max(0, Math.min(1, t))
-    
-                        var d = p.distanceTo(new Calc.Vector(
-                            b.x + t * (c.x - b.x),
-                            b.y + t * (c.y - b.y)
-                        ))
-                        var n: Calc.Vector = b.difference(c)
-                        n.angle = n.angle + Math.PI/2
-
-                        coll =  {
-                            penetration: d,
-                            normal: n.unit
-                        }
-                    }
-
-                    if (!result) {
-                        result = coll
-                    } else if (coll.penetration < result.penetration) {
-                        result = coll
-                    }
-                }
-            }
-        }
-
-        return result
-    }
-    
-
-    /**
-     * Get penetration depth using the seperating axis theorem.
-     * @param shape other polygon.
-     * @param rpos position of second polygon relative to this polygon.
-     */
-    seperatingAxis(shape: Polygon, rpos: Calc.Vector): PolygonCollision {
-        // polygon normals
-        var poly1normals: Calc.Vector[] = this.normals
-        var poly2normals: Calc.Vector[] = shape.normals
-
-        var isSeparated = false
-
-
-        // first poly
-        for (const n of poly1normals) {
-            var r1 = this.getMinMax(n)
-            var r2 = shape.getMinMax(n, rpos)
-
-            isSeparated = r1.max < r2.min || r2.max < r1.min
-            if (isSeparated) break;
-        }
-
-        if (!isSeparated) {
-            for (const n of poly2normals) {
-                var r1 = this.getMinMax(n)
-                var r2 = shape.getMinMax(n, rpos)                
-    
-                isSeparated = r1.max < r2.min || r2.max < r1.min
-                if (isSeparated) break;
-            }
-        }
-
-        if (isSeparated) {
-            return {
-                penetration: undefined,
-                normal: rpos.unit
-            }
-        }
-        return {
-            penetration: 0.00000001,
-            normal: rpos.unit
-        }
-
-
-
-        // // getting min and max for this polygon
-        // var min1: number = poly1[0].copy().dotproduct(axis)
-        // var max1: number = min1
-
-        // for (const p1 of poly1) {
-        //     var currentProjection: number = p1.dotproduct(axis)
-
-        //     if (currentProjection > max1) {
-        //         max1 = currentProjection
-        //     }
-        //     if (currentProjection < min1) {
-        //         min1 = currentProjection                
-        //     }
-        // }
-
-        
-        // // getting min and max for second polygon
-        // var min2: number = poly2[0].copy().add(rpos).dotproduct(axis)
-        // var max2: number = min2
-
-        // for (const p2 of poly2) {
-        //     var currentProjection: number = p2.add(rpos).dotproduct(axis)
-
-        //     if (currentProjection > max2) {
-        //         max2 = currentProjection
-        //     }
-        //     if (currentProjection < min2) {
-        //         min2 = currentProjection                
-        //     }
-        // }
-
-        // var penetration: number
-        // var gap: number = Math.max(min2 - max1, min1 - max2)
-
-        // if (min2 < max1 && max1 < max2) {
-        //     penetration = max1 - min2
-        // }
-        // if (min1 < max2 && min2 < min1) {
-        //     penetration = max2 - min1
-        // }
-
-        
-        // console.log({
-        //     min1,
-        //     max1,
-        //     min2,
-        //     max2,
-        //     gap
-        // });
-    }
-
-
-    getMinMax(axis: Calc.Vector, pos: Calc.Vector = new Calc.Vector(0, 0)): PolygonMinMax {
-        var poly: Calc.Vector[] = this.rotatedPoints
-        var min: number = poly[0].copy().add(pos).dotproduct(axis)
-        var max: number = min
-
-        for (const p1 of poly) {
-            var currentProjection: number = p1.add(pos).dotproduct(axis)
-
-            if (currentProjection > max) {
-                max = currentProjection
-            }
-            if (currentProjection < min) {
-                min = currentProjection                
-            }
-        }
-
-        return {
-            max,
-            min
-        }
-    }
-
-
     momentOfInertia(m: number): number {
         var c: number = 0
         var d: number = 0
@@ -385,14 +206,7 @@ export class Polygon {
     }
 
     draw(pos: Calc.Vector, angle: number): void {
-        var points: Calc.Vector[] = this.rotatedPoints        
-
-        //var box: Shape.BoundingBox = this.boundingBox
-        /*Game.renderer.drawRect({
-            start: box.min.add(pos),
-            end: box.max.add(pos),
-            stroke: { color: "#ff00ff"}
-        })*/
+        var points: Calc.Vector[] = this.rotatedPoints
 
         Game.renderer.drawPolygon({
             pos: pos,
@@ -402,6 +216,82 @@ export class Polygon {
                 color: "#0000ff"
             }
         })
+    }
+}
+
+/**
+ * 
+ * @param poly1 first polygon is positioned at 0,0.
+ * @param poly2 second polygon is positioned relative to poly1 at position shape2pos.
+ * @param shape2pos 
+ */
+export function isColliding(poly1: Polygon, poly2: Polygon, shape2pos: Calc.Vector): boolean {
+    // polygon normals
+    var poly1normals: Calc.Vector[] = poly1.normals
+    var poly2normals: Calc.Vector[] = poly2.normals
+
+    var isSeparated = false
+
+
+    // first poly
+    for (const n of poly1normals) {
+        var r1 = getMinMaxPoly(poly1, n)
+        var r2 = getMinMaxPoly(poly2, n, shape2pos)
+
+        isSeparated = r1.max < r2.min || r2.max < r1.min
+        if (isSeparated) break;
+    }
+
+    if (!isSeparated) {
+        for (const n of poly2normals) {
+            var r1 = getMinMaxPoly(poly1, n)
+            var r2 = getMinMaxPoly(poly2, n, shape2pos)                
+
+            isSeparated = r1.max < r2.min || r2.max < r1.min
+            if (isSeparated) break;
+        }
+    }
+
+    /* if (isSeparated) {
+        return {
+            penetration: undefined,
+            normal: shape2pos.unit
+        }
+    }
+    return {
+        penetration: 0.00000001,
+        normal: shape2pos.unit
+    } */
+
+    return !isSeparated
+}
+
+
+/**
+ * get the minimum and maximum projection on an axis of a polygon.
+ * @param poly the polygon to get the minimum and maximum projection of.
+ * @param axis axis to project the points on.
+ * @param pos offset position
+ */
+export function getMinMaxPoly(poly: Polygon, axis: Calc.Vector, pos: Calc.Vector = new Calc.Vector(0, 0)): PolygonMinMax {
+    var points: Calc.Vector[] = poly.rotatedPoints
+    var min: number = points[0].copy().add(pos).dotproduct(axis)
+    var max: number = min
+
+    for (const p1 of points) {
+        var currentProjection: number = p1.add(pos).dotproduct(axis)
+
+        if (currentProjection > max) {
+            max = currentProjection
+        }
+        if (currentProjection < min) {
+            min = currentProjection                
+        }
+    }
+
+    return {
+        max,
+        min
     }
 }
 

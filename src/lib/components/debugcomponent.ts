@@ -2,6 +2,12 @@ import { Game } from "../game";
 import { Component } from "../game/component";
 import { Calc } from "../calc";
 import { PhysicsComponent } from "./physicscomponent";
+import { rectangle } from "../game/renderer";
+
+
+interface DebugComponentProps {
+    enable?: boolean;
+}
 
 interface DebugVector {
     name: string;
@@ -92,6 +98,11 @@ export class DebugComponent extends Component {
         } else {
             this.values[i].val = val;
         }
+    }
+
+
+    drawRect(opt: rectangle): void {
+        if (this.enable) Game.renderer.drawRect(opt)
     }
 
 

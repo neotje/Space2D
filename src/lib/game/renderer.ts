@@ -17,7 +17,7 @@ interface line {
     width?: number;
 }
 
-interface rectangle {
+export interface rectangle {
     start: Calc.Vector;
     end?: Calc.Vector;
     width?: number;
