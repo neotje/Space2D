@@ -215,6 +215,7 @@ export class Polygon {
             stroke: {
                 color: "#0000ff"
             }
+<<<<<<< HEAD
         })
     }
 }
@@ -240,6 +241,13 @@ export function isColliding(poly1: Polygon, poly2: Polygon, shape2pos: Calc.Vect
 
         isSeparated = r1.max < r2.min || r2.max < r1.min
         if (isSeparated) break;
+=======
+        }
+        return {
+            penetration: 0.00000001,
+            normal: rpos.unit
+        }
+>>>>>>> aeab9ab5772b1678dacf6e34741f84c9dda9fe97
     }
 
     if (!isSeparated) {
