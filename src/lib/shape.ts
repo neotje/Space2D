@@ -1,6 +1,9 @@
 import { Calc } from "./calc"
 import { Polygon } from "./shapes/polygon"
 
+/**
+ * @category shape
+ */
 export namespace Shape {
     export interface BoundingBox {
         min: Calc.Vector

@@ -5,6 +5,9 @@ import { Calc } from "./calc";
 import { Renderer } from "./game";
 import { GameObject } from "./game";
 
+/**
+ * @category Game
+ */
 export namespace Game {
     export var root = new GameObject({ name: "root", position: new Calc.Vector(0, 0), color: "#ff0000" });
     export var renderer = new Renderer(document.querySelector('#game'), {

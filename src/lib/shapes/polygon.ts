@@ -166,7 +166,6 @@ export class Polygon {
      * @param p 
      */
     isPointInside(p: Calc.Vector): boolean {
-        var start: number = performance.now()
         var points: Calc.Vector[] = this.rotatedPoints
         var collision: boolean = false
 
@@ -182,10 +181,6 @@ export class Polygon {
             ) {
                 collision = !collision
             }
-        }
-
-        if (Game.renderer.options.drawStats) {
-            //console.log("Point inside poly performance: " + (performance.now() - start))
         }
         
         return collision
@@ -220,12 +215,12 @@ export class Polygon {
 }
 
 /**
- * 
+ * check if two polygons are colliding by utilizing the seperating axis theorem.
  * @param poly1 first polygon is positioned at 0,0.
  * @param poly2 second polygon is positioned relative to poly1 at position shape2pos.
- * @param shape2pos 
+ * @param shape2pos position of poly2 relative to poly1
  */
-export function isColliding(poly1: Polygon, poly2: Polygon, shape2pos: Calc.Vector): boolean {
+export function isColliding(poly1: Polygon, poly2: Polygon, poly2pos: Calc.Vector): boolean {
     // polygon normals
     var poly1normals: Calc.Vector[] = poly1.normals
     var poly2normals: Calc.Vector[] = poly2.normals
@@ -236,7 +231,7 @@ export function isColliding(poly1: Polygon, poly2: Polygon, shape2pos: Calc.Vect
     // first poly
     for (const n of poly1normals) {
         var r1 = getMinMaxPoly(poly1, n)
-        var r2 = getMinMaxPoly(poly2, n, shape2pos)
+        var r2 = getMinMaxPoly(poly2, n, poly2pos)
 
         isSeparated = r1.max < r2.min || r2.max < r1.min
         if (isSeparated) break;
@@ -245,7 +240,7 @@ export function isColliding(poly1: Polygon, poly2: Polygon, shape2pos: Calc.Vect
     if (!isSeparated) {
         for (const n of poly2normals) {
             var r1 = getMinMaxPoly(poly1, n)
-            var r2 = getMinMaxPoly(poly2, n, shape2pos)                
+            var r2 = getMinMaxPoly(poly2, n, poly2pos)                
 
             isSeparated = r1.max < r2.min || r2.max < r1.min
             if (isSeparated) break;

@@ -1,5 +1,8 @@
 import { Calc } from "./calc";
 
+/**
+ * @category Math
+ */
 export namespace Physics {
     export const Constants = {
         G: 6.67384e-11,

@@ -72,7 +72,14 @@ for (const camera of this.cameras) {
 }
 */
 
-var startTime = 0;
+var startTime = 0
+
+var max = 0
+var maxCurrent = 0
+var avrage: number
+var every = 2
+var tempi = 0
+var buffer = 0
 
 /**
  * @category Graphics
@@ -86,6 +93,8 @@ export class Renderer {
     frame: number = 0;
     fps: number = 0;
     dt: number = 0;
+
+    graphPoints: number[] = [];
 
     constructor(canvas: HTMLCanvasElement, options?: RendererOptions) {
         this.options = options;
@@ -139,7 +148,6 @@ export class Renderer {
                 this.update();
             }, 0);
         }
-
     }
 
     /**
@@ -157,6 +165,77 @@ export class Renderer {
         this.ctx.fillText(`draw dt: ${this.dt}`, 10, 38);
         this.ctx.fillText(`game dt: ${stats.deltaTime}`, 10, 52);
         this.ctx.fillText(`speed: ${stats.speed}`, 10, 66);
+
+        // performance graph
+        if (!avrage) avrage = stats.deltaTime
+        avrage = (avrage + stats.deltaTime) / 2
+
+
+        // buffer keeps counting
+        if (buffer == 0) buffer = stats.deltaTime
+        buffer = (stats.deltaTime + buffer )/ 2
+
+        // dump buffer when every frames has passed
+        if (tempi == 0 || this.graphPoints.length == 0 || this.frame < 50) {
+            this.graphPoints.push(buffer)
+            buffer = 0
+        }
+        tempi++
+        if (tempi >= every) {
+            tempi = 0
+        }
+
+        if (this.graphPoints.length > 100) this.graphPoints.shift()        
+
+        // graph width and height
+        var height: number = 120
+        var width: number = 290
+
+        var start: number = this.canvas.width - width - 50
+
+        max = Math.max(...this.graphPoints, max)
+        if (!maxCurrent) maxCurrent = Math.max(...this.graphPoints)
+        maxCurrent = (Math.max(...this.graphPoints) + maxCurrent) / 1.9
+
+        var lineWidth = Math.ceil(width / 100)
+
+        // draw graph collumns
+        for (let i = 0; i < this.graphPoints.length; i++) {
+            const v = this.graphPoints[i]
+            var x: number = start + i * lineWidth
+            var y: number = height + 50
+            var g: number = (max - v)/max * 255            
+            
+            this.ctx.strokeStyle = `rgb(255, ${(g)}, 0)`
+            this.ctx.lineWidth = lineWidth
+
+            this.ctx.beginPath()
+            this.ctx.moveTo(x, y)
+            this.ctx.lineTo(x, y - (v/maxCurrent * height))
+            this.ctx.closePath()
+            this.ctx.stroke()
+        }
+
+        // draw avrage line
+        var g: number = (max - avrage)/max * 255
+        var avrLineY = y - (avrage/maxCurrent * height)       
+
+        this.ctx.strokeStyle = `rgb(255, 0, ${Math.round(g)})`
+        this.ctx.lineWidth = 1
+
+        this.ctx.beginPath()
+        this.ctx.moveTo(start, avrLineY)
+        this.ctx.lineTo(start + width, avrLineY)
+        this.ctx.closePath()
+        this.ctx.stroke()
+
+        // draw legenda
+        this.ctx.font = "10px sans-serif"
+        this.ctx.fillStyle = "#fff"
+
+        this.ctx.fillText("0", start - 20, y)
+        this.ctx.fillText(`${Calc.roundTo(avrage * 1000, 4)} ms`, start - 60, avrLineY)
+        this.ctx.fillText(`${Calc.roundTo(maxCurrent * 1000, 4)} ms`, start - 60, 50)
     }
 
     /**

@@ -1,6 +1,9 @@
 import * as main from "../../docs/assets/js/main";
 import anime from "./anime.es";
 
+/**
+ * @category Math
+ */
 export namespace Calc {
     /**
      * Round a number
