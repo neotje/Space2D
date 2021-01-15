@@ -292,58 +292,6 @@ export class Polygon {
             penetration: 0.00000001,
             normal: rpos.unit
         }
-
-
-
-        // // getting min and max for this polygon
-        // var min1: number = poly1[0].copy().dotproduct(axis)
-        // var max1: number = min1
-
-        // for (const p1 of poly1) {
-        //     var currentProjection: number = p1.dotproduct(axis)
-
-        //     if (currentProjection > max1) {
-        //         max1 = currentProjection
-        //     }
-        //     if (currentProjection < min1) {
-        //         min1 = currentProjection                
-        //     }
-        // }
-
-        
-        // // getting min and max for second polygon
-        // var min2: number = poly2[0].copy().add(rpos).dotproduct(axis)
-        // var max2: number = min2
-
-        // for (const p2 of poly2) {
-        //     var currentProjection: number = p2.add(rpos).dotproduct(axis)
-
-        //     if (currentProjection > max2) {
-        //         max2 = currentProjection
-        //     }
-        //     if (currentProjection < min2) {
-        //         min2 = currentProjection                
-        //     }
-        // }
-
-        // var penetration: number
-        // var gap: number = Math.max(min2 - max1, min1 - max2)
-
-        // if (min2 < max1 && max1 < max2) {
-        //     penetration = max1 - min2
-        // }
-        // if (min1 < max2 && min2 < min1) {
-        //     penetration = max2 - min1
-        // }
-
-        
-        // console.log({
-        //     min1,
-        //     max1,
-        //     min2,
-        //     max2,
-        //     gap
-        // });
     }
 
 
