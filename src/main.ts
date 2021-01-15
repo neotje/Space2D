@@ -77,20 +77,5 @@ var poly2 = new Polygon([
     new Calc.Vector(-10, 10)
 ])
 
-poly2.angle = Math.PI / 4
-
-console.log(poly1.rotatedPoints);
-
-console.log(poly1.rotatedPoints[0].difference(poly1.rotatedPoints[1]));
-console.log(new Calc.Vector(10, 10).difference(new Calc.Vector(10, -10)).leftNormal);
-
-
-console.log(poly1.normals);
-console.log(poly2.normals);
-
-
-console.log(poly1.seperatingAxis(poly2, new Calc.Vector(15, 0)))
-console.log(new Calc.Vector(1,1).unit.scale(0.1).magnitude);
-
 
 

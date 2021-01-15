@@ -1,6 +1,6 @@
 import { Component } from "../game/component"
 import { Game } from "../game"
-import { Polygon } from "../shapes/polygon"
+import { isColliding, Polygon } from "../shapes/polygon"
 import { Shape } from "../shape";
 import { DebugComponent } from "./debugcomponent";
 import { PhysicsComponent } from "./physicscomponent";
@@ -56,18 +56,15 @@ export class RigidBodyComponent extends Component {
                 // get relative of component
                 var cRelativePos: Calc.Vector = this.parent.worldPosition.difference(component.parent.worldPosition)
                 // get SAT results
-                var SAT = this.shape.seperatingAxis(component.shape, cRelativePos)
+                var SAT = isColliding(this.shape, component.shape, cRelativePos)                
 
-                console.debug(this.id, SAT.penetration);
-                
-
-                if(SAT.penetration) {
+                if(SAT) {
                     console.debug(Game.getStatistics().updateCount, SAT)
 
                     for (const c of this.parent.components) {
                         c.onCollision({
-                            penetration: SAT.penetration,
-                            normal: SAT.normal,
+                            penetration: 0.000000001, // temp
+                            normal: cRelativePos.unit, // temp
                             object: component.parent
                         })
                     }

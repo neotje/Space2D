@@ -130,7 +130,7 @@ export class PhysicsComponent extends Component {
         var debug: DebugComponent = this.parent.getComponentByType("DebugComponent")
 
         // save some debug data
-        if (debug) {
+        if (debug && debug.enable) {
             this.t += dt
 
             if (this.t > 0.01) {
@@ -195,7 +195,7 @@ export class PhysicsComponent extends Component {
         this.parent.rotation += this.angularVelocity * dt
         this.collisionShape.angle = this.parent.rotation
 
-        if (debug) {
+        if (debug && debug.enable) {
             debug.vector('v', this.velocity, '#ff0000')
             debug.vector('f', this.f, '#00ff00')
             debug.vector('p', this.impulse, '#ffff00')
@@ -211,7 +211,7 @@ export class PhysicsComponent extends Component {
         //console.log(this.debugPoints)
         var debug: DebugComponent = this.parent.getComponentByType("DebugComponent")
 
-        if (debug) {
+        if (debug && debug.enable) {
             if (this.debugPoints.length > 1) {
                 //Game.renderer.drawPointList(this.debugPoints)
             }
