@@ -43,38 +43,11 @@ Game.root.addChild(
             velocity: new Calc.Vector(10, 0)
         }, undefined, false),
         new DebugComponent('debug')
-    ),
-    /*new GameObject({ name: 'sun', position: new Calc.Vector(0, 0), rotation: 0 }).addComponent(
-        new PhysicsComponent('physics', {
-            mass: 1.989e15
-        }),
-        new DebugComponent('debug')
-    ),
-    new GameObject({ name: 'planet 1', position: new Calc.Vector(-200, 0), rotation: 0 }).addComponent(
-        new PhysicsComponent('obj2', {
-            mass: 4,
-            velocity: Physics.firstCosmicVelocityVector(1.989e15, new Calc.Vector(0, 0), new Calc.Vector(200, 0)),
-            collisionShape: Shape.genRegularPolygon(20, 10)
-        }),
-        new DebugComponent('debug')
-    ),
-    new GameObject({ name: 'exoplanet 3', position: new Calc.Vector(0, -100), rotation: 0 }).addComponent(
-        new PhysicsComponent('obj2', {
-            mass: 1,
-            velocity: new Calc.Vector(15, 0),
-            collisionShape: new Polygon([
-                new Calc.Vector(20, 10),
-                new Calc.Vector(10, -10),
-                new Calc.Vector(-10, -10),
-                new Calc.Vector(-10, 10)
-            ])
-        }),
-        new DebugComponent('debug')
-    )*/
+    )
 )
 
 console.log(Game.root);
-console.log(Game.root.findComponent('.RigidBodyComponent'));
+console.log(Game.root.findComponent('.DebugComponent'));
 
 
 var v = Shape.genRegularPolygon(20, 10)
