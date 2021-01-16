@@ -190,10 +190,10 @@ class Graph {
             this.i = 0
         }
 
-        while (this.updateLoop.points.length > this.amountOfPoints) {
+        while (this.updateLoop.points.length >= this.amountOfPoints) {
             this.updateLoop.points.shift()
         }
-        while (this.renderLoop.points.length > this.amountOfPoints) {
+        while (this.renderLoop.points.length >= this.amountOfPoints) {
             this.renderLoop.points.shift()
         }
 
@@ -258,10 +258,10 @@ class Graph {
         ctx.beginPath()
 
         ctx.moveTo(avrLineUpdate.x, avrLineUpdate.y)
-        ctx.lineTo(avrLineUpdate.x + this.width, avrLineUpdate.y)
+        ctx.lineTo(avrLineUpdate.x + this.width + 0.5*lineWidth, avrLineUpdate.y)
 
         ctx.moveTo(avrLineRender.x, avrLineRender.y)
-        ctx.lineTo(avrLineRender.x + this.width, avrLineRender.y)
+        ctx.lineTo(avrLineRender.x + this.width + 0.5*lineWidth, avrLineRender.y)
 
         ctx.closePath()
         ctx.stroke()
@@ -299,7 +299,7 @@ export class Renderer {
     dt: number = 0
 
     graphPoints: number[] = []
-    graph: Graph = new Graph(0)
+    graph: Graph = new Graph(10)
 
     constructor(canvas: HTMLCanvasElement, options?: RendererOptions) {
         this.options = options;
