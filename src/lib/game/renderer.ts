@@ -10,13 +10,19 @@ interface RendererOptions {
     vsync?: boolean;
 }
 
-interface line {
+/**
+ * @category Draw
+ */
+export interface line {
     start: Calc.Vector;
     end: Calc.Vector;
     color?: string;
     width?: number;
 }
 
+/**
+ * @category Draw
+ */
 export interface rectangle {
     start: Calc.Vector;
     end?: Calc.Vector;
@@ -26,25 +32,37 @@ export interface rectangle {
     stroke?: stroke;
 }
 
-interface circle {
+/**
+ * @category Draw
+ */
+export interface circle {
     pos: Calc.Vector;
     radius: number;
     fill?: fill;
     stroke?: stroke;
 }
 
-interface ellipse {
+/**
+ * @category Draw
+ */
+export interface ellipse {
     pos: Calc.Vector;
     radius: Calc.Vector;
     fill?: fill;
     stroke?: stroke;
 }
 
-interface point {
+/**
+ * @category Draw
+ */
+export interface point {
     pos: Calc.Vector;
 }
 
-interface polygon {
+/**
+ * @category Draw
+ */
+export interface polygon {
     pos: Calc.Vector;
     points: Calc.Vector[];
     angle?: number;
@@ -52,25 +70,28 @@ interface polygon {
     stroke?: stroke;
 }
 
-interface fill {
+/**
+ * @category Draw
+ */
+export interface fill {
     color?: string;
 }
 
-interface stroke {
+/**
+ * @category Draw
+ */
+export interface stroke {
     color?: string;
     width?: number;
 }
 
+/**
+ * @category Draw
+ */
 interface text {
     color?: string;
     font?: string;
 }
-
-/**
-for (const camera of this.cameras) {
-            
-}
-*/
 
 var startTime = 0
 
@@ -81,20 +102,204 @@ var every = 2
 var tempi = 0
 var buffer = 0
 
+interface GraphData {
+    max: number;
+    maxOfCurrentVal: number;
+    average?: number;
+    points: number[];
+    buffer: number;
+}
+
+class Graph {
+    updateLoop: GraphData = {
+        max: 0,
+        maxOfCurrentVal: 0,
+        points: [],
+        buffer: 0
+    }
+
+    renderLoop: GraphData = {
+        max: 0,
+        maxOfCurrentVal: 0,
+        points: [],
+        buffer: 0
+    }
+
+    every: number;
+    i: number = 0;
+    amountOfPoints: number = 10;
+
+    height: number = 120
+    width: number = 290
+
+    mode: "probe" | "average" | "max"
+
+    constructor(every: number = 0) {
+        this.every = every
+        this.mode = "max"
+    }
+
+    get max(): number {
+        return Math.max(this.updateLoop.max, this.renderLoop.max)
+    }
+    get maxOfCurrentVals(): number {
+        return Math.max(this.updateLoop.maxOfCurrentVal, this.renderLoop.maxOfCurrentVal)
+    }
+
+    updateAverages(stats: Game.Statistics) {
+        // update averages
+        if (!this.updateLoop.average) this.updateLoop.average = stats.deltaTime
+        if (!this.renderLoop.average) this.renderLoop.average = Game.renderer.dt
+        this.updateLoop.average = (this.updateLoop.average + stats.deltaTime) / 2
+        this.renderLoop.average = (this.renderLoop.average + Game.renderer.dt) / 2
+    }
+
+    updateBuffers(stats: Game.Statistics) {
+        if (this.updateLoop.buffer == 0) this.updateLoop.buffer = stats.deltaTime
+
+        if (this.renderLoop.buffer == 0) this.renderLoop.buffer = Game.renderer.dt
+
+        if (this.mode == "average") {
+            this.updateLoop.buffer = (this.updateLoop.buffer + stats.deltaTime) / 2
+            this.renderLoop.buffer = (this.renderLoop.buffer + Game.renderer.dt) / 2
+        }
+        if (this.mode == "probe") {
+            this.updateLoop.buffer = stats.deltaTime
+            this.renderLoop.buffer = Game.renderer.dt
+        }
+        if (this.mode == "max") {
+            this.updateLoop.buffer = Math.max(this.updateLoop.buffer, stats.deltaTime)
+            this.renderLoop.buffer = Math.max(this.renderLoop.buffer, Game.renderer.dt)
+        }
+    }
+
+    dumpBuffers() {
+        this.updateLoop.points.push(this.updateLoop.buffer)
+        this.renderLoop.points.push(this.renderLoop.buffer)
+
+        this.updateLoop.buffer = 0
+        this.renderLoop.buffer = 0
+    }
+
+    updateGraphPoints(stats: Game.Statistics) {
+        if (this.i == 0 || this.every == 0) {
+            this.dumpBuffers()
+        }
+        this.i++
+        if (this.i >= this.every) {
+            this.i = 0
+        }
+
+        while (this.updateLoop.points.length > this.amountOfPoints) {
+            this.updateLoop.points.shift()
+        }
+        while (this.renderLoop.points.length > this.amountOfPoints) {
+            this.renderLoop.points.shift()
+        }
+
+        this.updateLoop.max = (Math.max(this.updateLoop.max, ...this.updateLoop.points))
+        this.renderLoop.max = (Math.max(this.renderLoop.max, ...this.renderLoop.points))
+
+        this.updateLoop.maxOfCurrentVal = (Math.max(...this.updateLoop.points) + this.updateLoop.maxOfCurrentVal) / 2
+        this.renderLoop.maxOfCurrentVal = (Math.max(...this.renderLoop.points) + this.renderLoop.maxOfCurrentVal) / 2
+    }
+
+    draw() {
+        var stats = Game.getStatistics()
+        var ctx = Game.renderer.ctx
+
+        this.updateAverages(stats)
+
+        this.updateBuffers(stats)
+
+        this.updateGraphPoints(stats)
+
+        var bottomLeft: Calc.Vector = new Calc.Vector(Game.renderer.canvas.width - this.width - 50, this.height + 50)
+        var topLeft: Calc.Vector = new Calc.Vector(Game.renderer.canvas.width - this.width - 50, 50)
+
+        var lineWidth = Math.ceil(this.width / this.amountOfPoints)
+        ctx.lineWidth = lineWidth
+
+        for (let i = 0; i < this.renderLoop.points.length; i++) {
+            const p = this.renderLoop.points[i];
+            var bottom: Calc.Vector = bottomLeft.copy().addX(i * lineWidth).addX(lineWidth / 2)
+            var top: Calc.Vector = bottom.copy().addY(-(p / this.maxOfCurrentVals * this.height))
+
+            ctx.strokeStyle = `rgb(0, 255, ${(this.renderLoop.max - p) / this.renderLoop.max * this.height})`
+
+            ctx.beginPath()
+            ctx.moveTo(bottom.x, bottom.y)
+            ctx.lineTo(top.x, top.y)
+            ctx.closePath()
+            ctx.stroke()
+        }
+
+        for (let i = 0; i < this.updateLoop.points.length; i++) {
+            const p = this.updateLoop.points[i];
+            var bottom: Calc.Vector = bottomLeft.copy().addX(i * lineWidth).addX(lineWidth / 2)
+            var top: Calc.Vector = bottom.copy().addY(-(p / this.maxOfCurrentVals * this.height))
+
+            ctx.strokeStyle = `rgb(255, ${(this.updateLoop.max - p) / this.updateLoop.max * this.height}, 0)`
+
+            ctx.beginPath()
+            ctx.moveTo(bottom.x, bottom.y)
+            ctx.lineTo(top.x, top.y)
+            ctx.closePath()
+            ctx.stroke()
+        }
+
+        // draw average lines
+        var avrLineUpdate: Calc.Vector = bottomLeft.copy().addY(-(this.updateLoop.average / this.renderLoop.maxOfCurrentVal * this.height))
+        var avrLineRender: Calc.Vector = bottomLeft.copy().addY(-(this.renderLoop.average / this.renderLoop.maxOfCurrentVal * this.height))
+
+        ctx.strokeStyle = `rgb(0, 0, 255)`
+        ctx.lineWidth = 1
+
+        ctx.beginPath()
+
+        ctx.moveTo(avrLineUpdate.x, avrLineUpdate.y)
+        ctx.lineTo(avrLineUpdate.x + this.width, avrLineUpdate.y)
+
+        ctx.moveTo(avrLineRender.x, avrLineRender.y)
+        ctx.lineTo(avrLineRender.x + this.width, avrLineRender.y)
+
+        ctx.closePath()
+        ctx.stroke()
+
+        // draw legenda
+        ctx.font = "10px sans-serif"
+        ctx.fillStyle = "#fff"
+
+        avrLineRender.y = Math.max(avrLineRender.y, topLeft.y + 15)
+        avrLineRender.y = Math.min(avrLineRender.y, bottomLeft.y - 15)
+
+        avrLineUpdate.y = Math.max(avrLineUpdate.y, topLeft.y + 15)
+        avrLineUpdate.y = Math.min(avrLineUpdate.y, bottomLeft.y - 15)
+
+        ctx.fillText("0", bottomLeft.x - 20, bottomLeft.y)
+
+        ctx.fillText(`${Calc.roundTo(this.updateLoop.average * 1000, 4)} ms`, avrLineUpdate.x - 60, avrLineUpdate.y)
+        ctx.fillText(`${Calc.roundTo(this.renderLoop.average * 1000, 4)} ms`, avrLineRender.x - 60, avrLineRender.y)
+
+        ctx.fillText(`${Calc.roundTo(this.maxOfCurrentVals * 1000, 4)} ms`, topLeft.x - 60, topLeft.y)
+    }
+}
+
 /**
  * @category Graphics
  */
 export class Renderer {
-    canvas: HTMLCanvasElement;
-    ctx: CanvasRenderingContext2D;
-    options: RendererOptions;
-    cameras: CameraComponent[];
+    canvas: HTMLCanvasElement
+    ctx: CanvasRenderingContext2D
+    options: RendererOptions
+    cameras: CameraComponent[]
 
-    frame: number = 0;
-    fps: number = 0;
-    dt: number = 0;
+    frame: number = 0
+    fps: number = 0
+    dt: number = 0
 
-    graphPoints: number[] = [];
+    graphPoints: number[] = []
+    graph: Graph = new Graph(10)
 
     constructor(canvas: HTMLCanvasElement, options?: RendererOptions) {
         this.options = options;
@@ -166,7 +371,9 @@ export class Renderer {
         this.ctx.fillText(`game dt: ${stats.deltaTime}`, 10, 52);
         this.ctx.fillText(`speed: ${stats.speed}`, 10, 66);
 
-        // performance graph
+        this.graph.draw()
+
+        /* // performance graph
         if (!avrage) avrage = stats.deltaTime
         avrage = (avrage + stats.deltaTime) / 2
 
@@ -235,7 +442,7 @@ export class Renderer {
 
         this.ctx.fillText("0", start - 20, y)
         this.ctx.fillText(`${Calc.roundTo(avrage * 1000, 4)} ms`, start - 60, avrLineY)
-        this.ctx.fillText(`${Calc.roundTo(maxCurrent * 1000, 4)} ms`, start - 60, 50)
+        this.ctx.fillText(`${Calc.roundTo(maxCurrent * 1000, 4)} ms`, start - 60, 50) */
     }
 
     /**

@@ -10,8 +10,9 @@ import { ElectricFieldComponent } from './lib/components/electricfieldcomponent'
 import { Physics } from './lib/physics';
 import { Shape } from './lib/shape';
 import { Vector } from '../docs/assets/js/main';
-import { RigidBodyComponent } from './lib/components/rigidbodycomponent';
+import { CollisionShapeComponent } from './lib/components/rigidbodycomponent';
 
+Game.renderer.options.vsync = true
 
 Game.root.addChild(
     new GameObject({ name: "player", position: new Calc.Vector(1, 0) }).addComponent(
@@ -28,7 +29,7 @@ Game.root.addChild(
     ),
     // id: 2
     new GameObject({ name: 'box 1', position: new Calc.Vector(0, 0), rotation: Math.PI/6 }).addComponent(
-        new RigidBodyComponent('body', {}),
+        new CollisionShapeComponent('body', {}),
         new PhysicsComponent('physics', {
             mass: 1,
             velocity: new Calc.Vector(0, 0)
@@ -37,10 +38,18 @@ Game.root.addChild(
     ),
     // id: 3
     new GameObject({ name: 'box 1', position: new Calc.Vector(-70, 0), rotation: Math.PI/4 }).addComponent(
-        new RigidBodyComponent('body', {}),
+        new CollisionShapeComponent('body', {}),
         new PhysicsComponent('physics', {
             mass: 2,
             velocity: new Calc.Vector(10, 0)
+        }, undefined, false),
+        new DebugComponent('debug')
+    ),
+    new GameObject({ name: 'box 1', position: new Calc.Vector(70, 0), rotation: Math.PI/3 }).addComponent(
+        new CollisionShapeComponent('body', {}),
+        new PhysicsComponent('physics', {
+            mass: 1,
+            velocity: new Calc.Vector(0, 0)
         }, undefined, false),
         new DebugComponent('debug')
     )

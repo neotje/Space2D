@@ -10,7 +10,6 @@ import { GameObject } from "../game/gameobject"
 interface PhysicalProperties {
     mass: number
     velocity?: Calc.Vector
-    collisionShape?: Polygon
 }
 
 interface Constrains {
@@ -44,9 +43,6 @@ export class PhysicsComponent extends Component {
         y: false
     }
 
-    // collision shape
-    collisionShape: Polygon
-
     private debugPoints: Calc.Vector[] = []
     private t: number = 0
     private heaviestBody: PhysicsComponent
@@ -57,25 +53,10 @@ export class PhysicsComponent extends Component {
 
         this.mass = props.mass
         this.velocity = (props.velocity) ? props.velocity : new Calc.Vector(0, 0)
-        this.collisionShape = (props.collisionShape) ? props.collisionShape : new Polygon([
-            new Calc.Vector(10, 10),
-            new Calc.Vector(10, -10),
-            new Calc.Vector(-10, -10),
-            new Calc.Vector(-10, 10)
-        ])
 
         this.enableGravity = (enableGravity === false) ? enableGravity : this.enableGravity
 
         this.constrains = (constrains) ? constrains : this.constrains
-    }
-
-
-    get boundingBox(): Shape.BoundingBox {
-        var box: Shape.BoundingBox = this.collisionShape.boundingBox
-        box.max.add(this.parent.worldPosition)
-        box.min.add(this.parent.worldPosition)
-
-        return box
     }
 
     get impulse(): Calc.Vector {
@@ -190,10 +171,10 @@ export class PhysicsComponent extends Component {
 
         this.parent.worldPosition = this.parent.worldPosition.add(this.velocity.copy().scale(dt))
         
-        this.angularVelocity += this.torque * (1 / this.collisionShape.momentOfInertia(this.mass)) * dt
+        //this.angularVelocity += this.torque * (1 / this.collisionShape.momentOfInertia(this.mass)) * dt
         
         this.parent.rotation += this.angularVelocity * dt
-        this.collisionShape.angle = this.parent.rotation
+        //this.collisionShape.angle = this.parent.rotation
 
         if (debug && debug.enable) {
             debug.vector('v', this.velocity, '#ff0000')
@@ -223,10 +204,6 @@ export class PhysicsComponent extends Component {
             if (this.heaviestBody) {
                 var r = this.parent.worldPosition.distanceTo(this.heaviestBody.parent.worldPosition)
                 debug.value('r', r)
-            }
-
-            if (this.collisionShape) {
-                this.collisionShape.draw(this.parent.worldPosition, this.parent.rotation)
             }
         }
     }

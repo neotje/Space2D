@@ -79,19 +79,19 @@ export class BasicMovementComponent extends Component {
     }
 
     update() {
-        var dt = Game.getDeltaTime();        
+        var dt = Game.getStatistics().deltaTime 
 
         if (this.up) {
-            this.parent.position.y -= this.speed * dt;
+            this.parent.position.y -= this.speed * dt
         }
         if (this.down) {
-            this.parent.position.y += this.speed * dt;
+            this.parent.position.y += this.speed * dt
         }
         if (this.left) {
-            this.parent.position.x -= this.speed * dt;
+            this.parent.position.x -= this.speed * dt
         }
         if (this.right) {
-            this.parent.position.x += this.speed * dt;
+            this.parent.position.x += this.speed * dt
         }
     }
 }

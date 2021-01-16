@@ -3,11 +3,17 @@ import { Calc } from "../calc";
 import { Shape } from "../shape";
 
 
+/**
+ * @category Shape
+ */
 interface PolygonCollision {
     penetration: number
     normal: Calc.Vector
 }
 
+/**
+ * @category Shape
+ */
 interface PolygonMinMax {
     max: number;
     min: number;
@@ -161,31 +167,6 @@ export class Polygon {
         return intersects
     }
 
-    /**
-     * Check if point is inside this polygon.
-     * @param p 
-     */
-    isPointInside(p: Calc.Vector): boolean {
-        var points: Calc.Vector[] = this.rotatedPoints
-        var collision: boolean = false
-
-        for (let current = 0; current < points.length; current++) {
-            var next = (current == points.length - 1) ? 0 : current + 1
-            
-            var b: Calc.Vector = points[current]
-            var c: Calc.Vector = points[next]
-
-            if (
-                ((b.y >= p.y && c.y < p.y) || (b.y < p.y && c.y >= p.y)) &&
-                (p.x < (c.x-b.y)*(p.y-b.y) / (c.y-b.y) + b.y)
-            ) {
-                collision = !collision
-            }
-        }
-        
-        return collision
-    }
-
     momentOfInertia(m: number): number {
         var c: number = 0
         var d: number = 0
@@ -288,6 +269,33 @@ export function getMinMaxPoly(poly: Polygon, axis: Calc.Vector, pos: Calc.Vector
         max,
         min
     }
+}
+
+
+/**
+ * check if point p is inside Polygon poly
+ * @param poly 
+ * @param p 
+ */
+export function isPointInside(poly: Polygon, p: Calc.Vector): boolean {
+    var points: Calc.Vector[] = poly.rotatedPoints
+    var collision: boolean = false
+
+    for (let current = 0; current < points.length; current++) {
+        var next = (current == points.length - 1) ? 0 : current + 1
+        
+        var b: Calc.Vector = points[current]
+        var c: Calc.Vector = points[next]
+
+        if (
+            ((b.y >= p.y && c.y < p.y) || (b.y < p.y && c.y >= p.y)) &&
+            (p.x < (c.x-b.y)*(p.y-b.y) / (c.y-b.y) + b.y)
+        ) {
+            collision = !collision
+        }
+    }
+    
+    return collision
 }
 
 function isOdd(num: number): boolean { return (num % 2) == 1;}

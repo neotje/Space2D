@@ -11,11 +11,14 @@ interface RigidBodyProps {
     shape?: Polygon
 }
 
-export class RigidBodyComponent extends Component {
+/**
+ * @category Component
+ */
+export class CollisionShapeComponent extends Component {
     shape: Polygon;
 
     constructor(name: string, props: RigidBodyProps) {
-        super(name, "RigidBodyComponent")
+        super(name, "CollisionShapeComponent")
 
         this.shape = (props.shape) ? props.shape : new Polygon([
             new Calc.Vector(10, 10),
@@ -45,7 +48,7 @@ export class RigidBodyComponent extends Component {
 
 
         // get all physics components
-        var components: RigidBodyComponent[] = Game.root.findComponent('.' + this.type)
+        var components: CollisionShapeComponent[] = Game.root.findComponent('.' + this.type)
 
         // boundingbox check
         var boundingBox: Shape.BoundingBox = this.boundingBox

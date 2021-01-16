@@ -3,6 +3,7 @@ import { Component } from "../game/component";
 import { Calc } from "../calc";
 import { PhysicsComponent } from "./physicscomponent";
 import { rectangle } from "../game/renderer";
+import { CollisionShapeComponent } from "./rigidbodycomponent";
 
 
 interface DebugComponentProps {
@@ -118,9 +119,9 @@ export class DebugComponent extends Component {
         var textPos = this.parent.worldPosition
 
         // determine the x position of the debug text.
-        var p: PhysicsComponent = this.parent.getComponentByType("PhysicsComponent")
-        if (p && p.collisionShape) {
-            textPos.x += p.collisionShape.boundingBox.max.x
+        var p: CollisionShapeComponent = this.parent.getComponentByType("CollisionShapeComponent")
+        if (p && p.shape) {
+            textPos.x += p.shape.boundingBox.max.x
         }
 
         // draw name and position info
