@@ -127,7 +127,7 @@ class Graph {
 
     every: number;
     i: number = 0;
-    amountOfPoints: number = 10;
+    amountOfPoints: number = 50;
 
     height: number = 120
     width: number = 290
@@ -299,7 +299,7 @@ export class Renderer {
     dt: number = 0
 
     graphPoints: number[] = []
-    graph: Graph = new Graph(10)
+    graph: Graph = new Graph(0)
 
     constructor(canvas: HTMLCanvasElement, options?: RendererOptions) {
         this.options = options;
