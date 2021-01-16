@@ -9,7 +9,6 @@ import { DebugComponent } from './lib/components/debugcomponent';
 import { ElectricFieldComponent } from './lib/components/electricfieldcomponent';
 import { Physics } from './lib/physics';
 import { Shape } from './lib/shape';
-import { Vector } from '../docs/assets/js/main';
 import { CollisionShapeComponent } from './lib/components/rigidbodycomponent';
 
 Game.renderer.options.vsync = true

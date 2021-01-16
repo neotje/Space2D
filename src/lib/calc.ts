@@ -1,4 +1,3 @@
-import * as main from "../../docs/assets/js/main";
 import anime from "./anime.es";
 
 /**
